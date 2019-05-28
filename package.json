@@ -1,0 +1,38 @@
+{
+  "name": "js-journal",
+  "productName": "JS Journal",
+  "version": "1.0.0",
+  "description": "Journal app made with electronjs.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "lint": "eslint src --color",
+    "build": "electron-builder build -p never",
+    "test": "mocha"
+  },
+  "build": {
+    "appId": "com.willem.js-journal",
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    },
+    "mac": {
+      "artifactName": "js-journal-mac.${ext}",
+      "category": "public.app-category.utility"
+    },
+    "win": {
+      "artifactName": "js-journal-win.${ext}"
+    },
+    "linux": {
+      "artifactName": "js-journal-linux.${ext}"
+    }
+  },
+  "repository": "https://github.com/wnuke/js-journal",
+  "author": "Willem Leitso",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^5.0.2",
+    "electron-builder": "^20.41.0",
+    "eslint": "^5.16.0"
+  }
+}
