@@ -1,0 +1,28 @@
+html, body, section, .full-height {
+  height: 100%;
+}
+
+#pad {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  border: none;
+  overflow: auto;
+  outline: none;
+  resize: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  overflow: auto;
+}
+
+#markdown {
+  overflow: auto;
+  border-left: 1px solid black;
+}
+
+.wordwrap {
+   white-space: pre-wrap;      /* CSS3 */
+   white-space: -moz-pre-wrap; /* Firefox */
+   white-space: -pre-wrap;     /* Opera <7 */
+   white-space: -o-pre-wrap;   /* Opera 7 */
+   word-wrap: break-word;      /* IE */
+}

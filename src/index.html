@@ -4,9 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <title>JS Journal</title>
+  <link href="bootstrap.min.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="container-fluid">
+
+  <section class="row">
+    <textarea class="col-md-6 full-height" id="pad" oninput="renderMD()"></textarea>
+    <div class="col-md-6 full-height wordwrap" id="markdown"></div>
+  </section>
   <script src="index.js"></script>
 </body>
 
