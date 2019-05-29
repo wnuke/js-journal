@@ -17,7 +17,7 @@
       <h6>Date: <input type="date" class="form-control" id="entrydate"></h6>
     </div>
     <div class="column">
-      <input type="button" class="btn-default" value="Create Entry" onclick="return createEntry('*empty*')">
+      <input type="button" class="btn-default" value="Create Entry" onclick="markdownDate(); createEntry(markdowndate)">
     </div>
     <div class="column">
       <h6>Load entry: <input type="list" list="entries" class="form-control" id="loadselect" placeholder="Select entry..."></h6>

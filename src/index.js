@@ -27,6 +27,17 @@ var nowlongday
 var nowlongmonth
 var longday
 var longmonth
+var markdowndate
+
+Intl.DateTimeFormat().resolvedOptions().timeZone
+
+function markdownDate() {
+  mdyear = '<h1 style="color:#6EAAD2;line-height: 0px;">' + d.getFullYear() + '</span><br>'
+  mddate = '<h2 style="color:#AAAAAA;line-height: 10px;">' + days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()] + '</span><br>'
+  mdtime = '<h6 style="color:#000000;line-height: 10px;">' + d.getHours() + ':' + d.getMinutes() + ' ' + Intl.DateTimeFormat().resolvedOptions().timeZone + '</span><br>'
+  markdowndate = mdyear + mddate + mdtime
+}
+markdownDate()
 
 function dateSmallText(day) {
   if (day == '1' || day == '21' || day == '31') {
@@ -38,11 +49,6 @@ function dateSmallText(day) {
   } else {
     return JSON.stringify(day) + 'th'
   }
-}
-
-function getLongDate(year, month, day) {
-  longday = days[day - 1]
-  longmonth = months[month - 1]
 }
 
 function getTodayDate() {
@@ -168,7 +174,8 @@ function convertTextAreaToMarkdown() {
   var html = converter.makeHtml(markdownText)
   markdownArea.innerHTML = html
   if (currentEntry == null) {
-    createEntry(markdownText)
+    markdownDate()
+    createEntry(markdowndate)
     saveEntriesIndex()
   } else {
     saveEntry(markdownText, currentEntry)
