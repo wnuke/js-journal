@@ -11,18 +11,21 @@
 <body class="container-fluid">
   <div class="row">
     <div class="column">
-      <h6>Title: <input type="text" id="entrytitle" placeholder="Title..." required></input></h6>
+      <h6>Title: <input type="text" class="form-control" id="entrytitle" placeholder="Title..." value="untitled"></h6>
     </div>
     <div class="column">
-      <h6>Date: <input type="text" id="entrydate" placeholder="YYYY-MM-DD" required></input></h6>
+      <h6>Date: <input type="date" class="form-control" id="entrydate"></h6>
     </div>
     <div class="column">
-        <h6>Load entry: <input list="entries" name="browser"></input></h6>
-        <datalist id="entries">
-        </datalist>
+      <input type="button" class="btn-default" value="Create Entry" onclick="return createEntry('*empty*')">
     </div>
     <div class="column">
-      <input type="button" class="btn-default btn-xs xs-btn-padding" value="Load" onclick="loadEntry()">
+      <h6>Load entry: <input type="list" list="entries" class="form-control" id="loadselect" placeholder="Select entry..."></h6>
+      <datalist id="entries">
+      </datalist>
+    </div>
+    <div class="column">
+      <input type="button" class="btn-default" value="Load" onclick="loadEntry()">
     </div>
   </div>
   <section class="row">
