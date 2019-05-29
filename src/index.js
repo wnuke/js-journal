@@ -8,7 +8,6 @@ var showdown = require('showdown')
 var converter = new showdown.Converter()
 var pad = document.getElementById('pad')
 var markdownArea = document.getElementById('markdown')
-var entrytitleinput = document.getElementById('entrytitle').value
 var indexofentriespath = path + '/index-of-entries.json'
 var indexofentries = []
 var indexofentriesArray
@@ -20,49 +19,29 @@ var nowdate
 var nowday
 var nowmonth
 var nowyear
-var nowlongdate
-var nowlongdatesmalltext
-var nowlongday
-var nowlongmonth
-var longday
-var longmonth
 var markdowndate
 
 Intl.DateTimeFormat().resolvedOptions().timeZone
 
 function markdownDate() {
-  mdyear = '<h1 style="color:#6EAAD2;line-height: 0px;">' + d.getFullYear() + '</span><br>'
-  mddate = '<h2 style="color:#AAAAAA;line-height: 10px;">' + days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()] + '</span><br>'
-  mdtime = '<h6 style="color:#000000;line-height: 10px;">' + d.getHours() + ':' + d.getMinutes() + ' ' + Intl.DateTimeFormat().resolvedOptions().timeZone + '</span><br>'
+  var mdyear = '<h1 style="color:#6EAAD2;line-height: 0px;">' + d.getFullYear() + '</span><br>'
+  var mddate = '<h2 style="color:#AAAAAA;line-height: 10px;">' + days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()] + '</span><br>'
+  var mdtime = '<h6 style="color:#000000;line-height: 10px;">' + d.getHours() + ':' + d.getMinutes() + ' ' + Intl.DateTimeFormat().resolvedOptions().timeZone + '</span><br>'
   markdowndate = mdyear + mddate + mdtime
 }
 markdownDate()
-
-function dateSmallText(day) {
-  if (day == '1' || day == '21' || day == '31') {
-    return JSON.stringify(day) + 'st'
-  } else if (day == '2' || day == '22') {
-    return JSON.stringify(day) + 'nd'
-  } else if (day == '3' || day == '23') {
-    return JSON.stringify(day) + 'rd'
-  } else {
-    return JSON.stringify(day) + 'th'
-  }
-}
 
 function getTodayDate() {
   nowday = JSON.stringify(makeTwoDig(d.getDate()))
   nowmonth = makeTwoDig(d.getMonth() + 1)
   nowyear = JSON.stringify(d.getFullYear())
   nowdate = nowyear + '-' + nowmonth + '-' + nowday
-  nowlongday = days[parseInt(d.getDay())]
-  nowlongmonth = months[parseInt(d.getMonth())]
-  nowlongdate = nowlongday + ' ' + nowday + ' ' + nowlongmonth + ' ' + nowyear
-  nowlongdatesmalltext = nowlongday + ' ' + dateSmallText(parseInt(d.getDay())) + ' ' + nowlongmonth + ' ' + nowyear
 }
 getTodayDate()
 
-setInterval(function(){getTodayDate()}, 60000)
+setInterval(() => {
+ getTodayDate()
+}, 60000)
 
 function makeTwoDig(number) {
   if (number < 10) {
@@ -144,7 +123,7 @@ function loadEntry() {
   }
   var id = parseInt(entry.substring(0, entry.indexOf('-')))
   var entrypath = indexofentries[id][3]
-  entrytitleinput = indexofentries[id][1]
+  document.getElementById('entrytitle').value = indexofentries[id][1]
   pad.value = fs.readFileSync(entrypath)
   currentEntry = id
   document.getElementById('loadselect').value = ''
@@ -174,7 +153,7 @@ function convertTextAreaToMarkdown() {
   previousMarkdownValue = markdownText
   var html = converter.makeHtml(markdownText)
   markdownArea.innerHTML = html
-  if (currentEntry == null) {
+  if (currentEntry === null) {
     markdownDate()
     createEntry(markdowndate)
     saveEntriesIndex()
