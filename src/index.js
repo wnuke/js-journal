@@ -20,16 +20,43 @@ var nowday
 var nowmonth
 var nowyear
 var markdowndate
+var loadingentry
+var newid
 
 Intl.DateTimeFormat().resolvedOptions().timeZone
+
+function makeCollapse() {
+  var coll = document.getElementsByClassName("collapsible");
+  var i;
+
+  for (i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+      var content = this.nextElementSibling;
+      if (content.style.display === "block") {
+        content.style.display = "none";
+      } else {
+        content.style.display = "block";
+      }
+    });
+  }
+}
+
+function makeTwoDig(number) {
+  if (number < 10) {
+    return '0' + number
+  } else {
+    return number
+  }
+}
 
 function markdownDate() {
   var mdyear = '<h1 style="color:#6EAAD2;line-height: 0px;">' + d.getFullYear() + '</span><br>'
   var mddate = '<h2 style="color:#AAAAAA;line-height: 10px;">' + days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()] + '</span><br>'
-  var mdtime = '<h6 style="color:#000000;line-height: 10px;">' + d.getHours() + ':' + d.getMinutes() + ' ' + Intl.DateTimeFormat().resolvedOptions().timeZone + '</span><br>'
+  var mdtime = '<h6 style="color:#000000;line-height: 10px;">' + makeTwoDig(d.getHours()) + ':' + makeTwoDig(d.getMinutes()) + ' ' + Intl.DateTimeFormat().resolvedOptions().timeZone + '</span><br>'
   markdowndate = mdyear + mddate + mdtime
 }
-markdownDate()
+
 
 function getTodayDate() {
   nowday = JSON.stringify(makeTwoDig(d.getDate()))
@@ -40,7 +67,7 @@ function getTodayDate() {
 getTodayDate()
 
 setInterval(() => {
- getTodayDate()
+  getTodayDate()
 }, 60000)
 
 function makeTwoDig(number) {
@@ -96,18 +123,54 @@ function saveFile(entryfilename, data) {
   saveEntriesIndex()
 }
 
+// loads entry from markdown file
+function loadEntry(entry) {
+  loadingentry = entry
+  if (entry === undefined) {
+    console.log('failed')
+    return 'failed'
+  }
+  var id = entry
+  var entrypath = indexofentries[id][3]
+  document.getElementById('entrytitle').value = indexofentries[id][1]
+  pad.value = fs.readFileSync(entrypath)
+  currentEntry = id
+  loadingentry = undefined
+}
+
 // creates the markdown file for an entry and adds it to the index
 function createEntry(data) {
+  getTodayDate()
   var entrytitle = document.getElementById('entrytitle').value
   var entrydate = nowdate
   var entryarray = []
-  var entryfilename = entriespath + '/' + entrydate + '-' + entrytitle + '-' + JSON.stringify(indexofentries.length) + '.md'
-  entryarray = [entrydate, entrytitle, indexofentries.length, entryfilename]
+  newid = indexofentries.length
+  var entryfilename = entriespath + '/' + entrydate + '-' + entrytitle + '-' + JSON.stringify(newid) + '.md'
+  entryarray = [entrydate, entrytitle, newid, entryfilename]
   indexofentries.push(entryarray)
-  currentEntry = indexofentries.length - 1
-  saveFile(indexofentries[indexofentries.length - 1][3], data)
-  pad.value = fs.readFileSync(entryfilename)
+  currentEntry = newid
+  markdownDate()
+  saveFile(indexofentries[newid][3], markdowndate)
   listEntries()
+}
+
+function createAndLoadEntry(data) {
+  createEntry(data)
+  loadEntry(indexofentries.length - 1)
+}
+
+function getEntryDateRange() {
+  var years = []
+  for (i = 0; i < indexofentries.length; i++) {
+    var entrydatepart = indexofentries[i][0]
+    var entryyear = parseInt(entrydatepart.substring(0, 4))
+    if (years.includes(entryyear)) {
+      // do nothing
+    } else {
+      years.push(entryyear)
+    }
+  }
+  return years
 }
 
 function saveEntry(data, entry) {
@@ -115,33 +178,50 @@ function saveEntry(data, entry) {
   saveFile(file, data)
 }
 
-// loads entry from markdown file
-function loadEntry() {
-  var entry = document.getElementById('loadselect').value
-  if (entry == '') {
-    return 'failed'
-  }
-  var id = parseInt(entry.substring(0, entry.indexOf('-')))
-  var entrypath = indexofentries[id][3]
-  document.getElementById('entrytitle').value = indexofentries[id][1]
-  pad.value = fs.readFileSync(entrypath)
-  currentEntry = id
-  document.getElementById('loadselect').value = ''
-}
-
 // list entries in entriespath
 function listEntries() {
+  var years = getEntryDateRange()
+  var entrieslistyearbutton = []
+  var entrieslistyeardiv = []
+  var entrieslistmonthbutton = []
+  var entrieslistmonthdiv = []
   var entries = []
+  getEntryDateRange()
   for (i = 0; i < indexofentries.length; i++) {
     entries[i] = JSON.stringify(indexofentries[i][2]) + '-' + indexofentries[i][1]
   }
   var entrieslist = []
-  document.getElementById('entries').innerHTML = ''
-  for (var i = 0; i < entries.length; i++) {
-    entrieslist[i] = document.createElement("option")
-    entrieslist[i].innerHTML = entries[i]
-    document.getElementById('entries').appendChild(entrieslist[i])
+  document.getElementById('sidenav').innerHTML = ''
+  for (var i = 0; i < years.length; i++) {
+    entrieslistyearbutton[i] = document.createElement('button')
+    entrieslistyearbutton[i].className = 'collapsible'
+    entrieslistyearbutton[i].innerHTML = years[i]
+    entrieslistyeardiv[i] = document.createElement('div')
+    entrieslistyeardiv[i].className = 'content'
+    for (var u = 0; u < 12; u++) {
+      entrieslistmonthbutton[u] = document.createElement('button')
+      entrieslistmonthbutton[u].className = 'collapsible'
+      entrieslistmonthbutton[u].innerHTML = months[u]
+      entrieslistmonthdiv[u] = document.createElement('div')
+      entrieslistmonthdiv[u].className = 'content'
+      for (var p = 0; p < indexofentries.length; p++) {
+        if (parseInt(indexofentries[p][0].substring(0, 4)) == years[i]) {
+          if (parseInt(indexofentries[p][0].substring(5, 7)) == u + 1) {
+            var listentry = document.createElement('button')
+            listentry.className = 'btn-link'
+            listentry.setAttribute('onClick', 'javascript: loadEntry(parseInt(indexofentries[' + JSON.stringify(p) + '][2]));')
+            listentry.innerHTML = indexofentries[p][1]
+            entrieslistmonthdiv[u].appendChild(listentry)
+          }
+        }
+      }
+      entrieslistyeardiv[i].appendChild(entrieslistmonthbutton[u])
+      entrieslistyeardiv[i].appendChild(entrieslistmonthdiv[u])
+    }
+    document.getElementById('sidenav').appendChild(entrieslistyearbutton[i])
+    document.getElementById('sidenav').appendChild(entrieslistyeardiv[i])
   }
+  makeCollapse()
 }
 listEntries()
 
