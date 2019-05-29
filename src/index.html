@@ -9,7 +9,22 @@
 </head>
 
 <body class="container-fluid">
-
+  <div class="row">
+    <div class="column">
+      <h6>Title: <input type="text" id="entrytitle" placeholder="Title..." required></input></h6>
+    </div>
+    <div class="column">
+      <h6>Date: <input type="text" id="entrydate" placeholder="YYYY-MM-DD" required></input></h6>
+    </div>
+    <div class="column">
+        <h6>Load entry: <input list="entries" name="browser"></input></h6>
+        <datalist id="entries">
+        </datalist>
+    </div>
+    <div class="column">
+      <input type="button" class="btn-default btn-xs xs-btn-padding" value="Load" onclick="loadEntry()">
+    </div>
+  </div>
   <section class="row">
     <textarea class="col-md-6 full-height" id="pad"></textarea>
     <div class="col-md-6 full-height wordwrap" id="markdown"></div>

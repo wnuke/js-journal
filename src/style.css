@@ -26,3 +26,20 @@ html, body, section, .full-height {
    white-space: -o-pre-wrap;   /* Opera 7 */
    word-wrap: break-word;      /* IE */
 }
+
+.column {
+  float: left;
+  width: auto;
+  display: inline-block;
+  padding: 10px;
+}
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.xs-btn-padding {
+  position: absolute;
+  top: 18px;
+}
