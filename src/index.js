@@ -157,6 +157,7 @@ function createEntry(data) {
 function createAndLoadEntry(data) {
   createEntry(data)
   loadEntry(indexofentries.length - 1)
+  listEntries()
 }
 
 function getEntryDateRange() {
