@@ -9,7 +9,6 @@ var converter = new showdown.Converter()
 var pad = document.getElementById('pad')
 var markdownArea = document.getElementById('markdown')
 var entrytitleinput = document.getElementById('entrytitle').value
-var entrydateinput = document.getElementById('entrydate').value
 var indexofentriespath = path + '/index-of-entries.json'
 var indexofentries = []
 var indexofentriesArray
@@ -60,7 +59,6 @@ function getTodayDate() {
   nowlongmonth = months[parseInt(d.getMonth())]
   nowlongdate = nowlongday + ' ' + nowday + ' ' + nowlongmonth + ' ' + nowyear
   nowlongdatesmalltext = nowlongday + ' ' + dateSmallText(parseInt(d.getDay())) + ' ' + nowlongmonth + ' ' + nowyear
-  document.getElementById('entrydate').value = nowdate
 }
 getTodayDate()
 
@@ -122,7 +120,7 @@ function saveFile(entryfilename, data) {
 // creates the markdown file for an entry and adds it to the index
 function createEntry(data) {
   var entrytitle = document.getElementById('entrytitle').value
-  var entrydate = document.getElementById('entrydate').value
+  var entrydate = nowdate
   var entryarray = []
   var entryfilename = entriespath + '/' + entrydate + '-' + entrytitle + '-' + JSON.stringify(indexofentries.length) + '.md'
   entryarray = [entrydate, entrytitle, indexofentries.length, entryfilename]
@@ -141,12 +139,15 @@ function saveEntry(data, entry) {
 // loads entry from markdown file
 function loadEntry() {
   var entry = document.getElementById('loadselect').value
+  if (entry == '') {
+    return 'failed'
+  }
   var id = parseInt(entry.substring(0, entry.indexOf('-')))
   var entrypath = indexofentries[id][3]
   entrytitleinput = indexofentries[id][1]
-  entrydateinput = indexofentries[id][0]
   pad.value = fs.readFileSync(entrypath)
   currentEntry = id
+  document.getElementById('loadselect').value = ''
 }
 
 // list entries in entriespath
