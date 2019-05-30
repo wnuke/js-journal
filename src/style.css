@@ -17,7 +17,6 @@ html, body, section, .full-height {
 
 #markdown {
   overflow: auto;
-  border-left: 1px solid black;
   height: 100%;
 }
 
@@ -48,7 +47,7 @@ html, body, section, .full-height {
 
 .sidenav {
   height: 100%;
-  width: 160px;
+  width: 250px;
   position: fixed;
   z-index: 1;
   top: 0;
@@ -71,7 +70,7 @@ html, body, section, .full-height {
 }
 
 .main {
-  margin-left: 160px; /* Same as the width of the sidebar */
+  margin-left: 250px;
   padding: 0px 10px;
 }
 
@@ -112,4 +111,16 @@ html, body, section, .full-height {
 
 .active:after {
   content: "\2796";
+}
+
+.hidden {
+  display: none;
+}
+
+.fullwidth {
+  width: 100%;
+}
+
+.leftborder {
+  border-left: 1px solid black;
 }

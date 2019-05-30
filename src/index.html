@@ -7,7 +7,6 @@
   <link href="bootstrap.min.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
 </head>
-
 <body class="container-fluid">
   <div class="sidenav" id="sidenav">
   </div>
@@ -22,6 +21,17 @@
         </div>
         <div class="column">
           <input type="button" class="btn btn-default" value="Create Entry" onclick="createAndLoadEntry(markdowndate); loadEntry(indexofentries.length - 1)">
+        </div>
+      </div>
+      <div class="container">
+        <div class="row">
+          <div class="col text-center">
+            <input type="button" class="btn btn-default" onclick="hidePreview()" value="Only Input"></input>
+            <input type="button" class="btn btn-default" onclick="showBoth()" value="Both"></input>
+            <input type="button" class="btn btn-default" onclick="hideInput()" value="Only Output"></input>
+            <br>
+            <br>
+          </div>
         </div>
       </div>
       <section class="row">

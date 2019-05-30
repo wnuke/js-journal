@@ -2,12 +2,14 @@ const {
   app
 } = require('electron').remote
 var fs = require('fs')
+var CryptoJS = require("crypto-js");
 var path = app.getPath('appData') + '/js-journal'
-var entriespath = path + '/entries'
 var showdown = require('showdown')
 var converter = new showdown.Converter()
 var pad = document.getElementById('pad')
 var markdownArea = document.getElementById('markdown')
+var mainArea = document.getElementById('main')
+var passArea = document.getElementById('pass')
 var indexofentriespath = path + '/index-of-entries.json'
 var indexofentries = []
 var indexofentriesArray
@@ -18,6 +20,7 @@ var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 var nowdate
 var nowday
 var nowmonth
+var password = 'test'
 var nowyear
 var markdowndate
 var loadingentry
@@ -40,6 +43,21 @@ function makeCollapse() {
       }
     });
   }
+}
+
+function hidePreview() {
+  markdownArea.className = 'hidden'
+  pad.className = 'col-md-6 full-height fullwidth'
+}
+
+function showBoth() {
+  markdownArea.className = 'col-md-6 full-height wordwrap leftborder'
+  pad.className = 'col-md-6 full-height'
+}
+
+function hideInput() {
+  markdownArea.className = 'col-md-6 full-height wordwrap fullwidth noborder'
+  pad.className = 'hidden'
 }
 
 function makeTwoDig(number) {
@@ -65,6 +83,14 @@ function getTodayDate() {
   nowdate = nowyear + '-' + nowmonth + '-' + nowday
 }
 getTodayDate()
+
+function getFullDate(year, month, day) {
+  var nd = new Date(year, month, day)
+  var fday = days[d.getDay()]
+  var fmonth = months[parseInt(month)]
+  var fdate = fday + ' ' + day.toString() + ' ' + fmonth + ' ' + year.toString()
+  return fdate
+}
 
 setInterval(() => {
   getTodayDate()
@@ -111,7 +137,7 @@ for (var i in indexofentriesArray) {
 }
 
 // create save directory if it doesn't exist
-fs.promises.mkdir(entriespath, {
+fs.promises.mkdir(path, {
   "recursive": true
 })
 
@@ -131,9 +157,10 @@ function loadEntry(entry) {
     return 'failed'
   }
   var id = entry
-  var entrypath = indexofentries[id][3]
   document.getElementById('entrytitle').value = indexofentries[id][1]
-  pad.value = fs.readFileSync(entrypath)
+  var encrypted = indexofentries[id][3]
+  var decrypted = decryptMD(encrypted)
+  pad.value = decrypted
   currentEntry = id
   loadingentry = undefined
 }
@@ -141,22 +168,23 @@ function loadEntry(entry) {
 // creates the markdown file for an entry and adds it to the index
 function createEntry(data) {
   getTodayDate()
+  markdownDate()
   var entrytitle = document.getElementById('entrytitle').value
   var entrydate = nowdate
   var entryarray = []
   newid = indexofentries.length
-  var entryfilename = entriespath + '/' + entrydate + '-' + entrytitle + '-' + JSON.stringify(newid) + '.md'
-  entryarray = [entrydate, entrytitle, newid, entryfilename]
+  entryarray = [entrydate, entrytitle, newid, markdowndate]
   indexofentries.push(entryarray)
   currentEntry = newid
   markdownDate()
-  saveFile(indexofentries[newid][3], markdowndate)
+  saveEntry(markdowndate, newid)
   listEntries()
 }
 
 function createAndLoadEntry(data) {
   createEntry(data)
   loadEntry(indexofentries.length - 1)
+  listEntries()
 }
 
 function getEntryDateRange() {
@@ -173,9 +201,20 @@ function getEntryDateRange() {
   return years
 }
 
+function encryptMD(mdtoencrypt) {
+  var ciphertext = CryptoJS.AES.encrypt(mdtoencrypt, password).toString();
+  return ciphertext
+}
+
+function decryptMD(mdtodecrypt) {
+  var bytes = CryptoJS.AES.decrypt(mdtodecrypt, password);
+  var originalText = bytes.toString(CryptoJS.enc.Utf8);
+  return originalText
+}
+
 function saveEntry(data, entry) {
-  var file = indexofentries[entry][3]
-  saveFile(file, data)
+  indexofentries[entry][3] = encryptMD(data)
+  saveEntriesIndex()
 }
 
 // list entries in entriespath
@@ -208,9 +247,12 @@ function listEntries() {
         if (parseInt(indexofentries[p][0].substring(0, 4)) == years[i]) {
           if (parseInt(indexofentries[p][0].substring(5, 7)) == u + 1) {
             var listentry = document.createElement('button')
-            listentry.className = 'btn-link'
-            listentry.setAttribute('onClick', 'javascript: loadEntry(parseInt(indexofentries[' + JSON.stringify(p) + '][2]));')
-            listentry.innerHTML = indexofentries[p][1]
+            listentry.className = 'btn btn-link'
+            listentry.setAttribute('onClick', 'javascript: loadEntry(parseInt(indexofentries[' + p + '][2]));')
+            var daytoconv = parseInt(indexofentries[p][0].substring(8, 10))
+            var monthtoconv = parseInt(indexofentries[p][0].substring(5, 7))
+            var yeartoconv = parseInt(indexofentries[p][0].substring(0, 4))
+            listentry.innerHTML = getFullDate(yeartoconv, monthtoconv, daytoconv)
             entrieslistmonthdiv[u].appendChild(listentry)
           }
         }
