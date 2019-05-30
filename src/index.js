@@ -7,12 +7,11 @@ var path = app.getPath('appData') + '/js-journal'
 var showdown = require('showdown')
 var converter = new showdown.Converter()
 var pad = document.getElementById('pad')
+var searchArea = document.getElementById('search')
 var markdownArea = document.getElementById('markdown')
-var mainArea = document.getElementById('all')
-var passArea = document.getElementById('pass')
 var indexofentriespath = path + '/index-of-entries.json'
 var indexofentries = []
-var indexofEntriesArray
+var indexofentriesArray
 var currentEntry = null
 var d = new Date();
 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -29,6 +28,21 @@ var locked = true
 
 Intl.DateTimeFormat().resolvedOptions().timeZone
 
+function openSearch() {
+  markdownArea.className = 'hidden'
+  searchArea.className = 'col-md-6 full-height wordwrap'
+  document.getElementById('opensearch').className = 'hidden'
+  document.getElementById('closesearch').className = 'btn btn-default'
+}
+
+function closeSearch() {
+  markdownArea.className = 'col-md-6 full-height wordwrap'
+  searchArea.className = 'hidden'
+  document.getElementById('closesearch').className = 'hidden'
+  document.getElementById('opensearch').className = 'btn btn-default'
+  showBoth()
+}
+
 function makeCollapse() {
   var coll = document.getElementsByClassName("collapsible");
   var i;
@@ -37,10 +51,10 @@ function makeCollapse() {
     coll[i].addEventListener("click", function() {
       this.classList.toggle("active");
       var content = this.nextElementSibling;
-      if (content.style.display === "block") {
+      if (content.style.display === "inline-block") {
         content.style.display = "none";
       } else {
-        content.style.display = "block";
+        content.style.display = "inline-block";
       }
     });
   }
@@ -74,14 +88,16 @@ function entriesFileToArray() {
   for (var i in indexofentriesArray) {
     if (indexofentriesArray.hasOwnProperty(i) && !isNaN(+i)) {
       indexofentries[+i] = indexofentriesArray[i];
-      console.log('loaded')
     }
   }
 }
 
 function lock() {
-  password = null
   locked = true
+  password = null
+  indexofentries = []
+  markdown.innerHTML = ''
+  document.getElementById('sidenav').innerHTML = ''
   pad.value = ''
   document.getElementById('entrytitle').value = 'untitled'
 }
@@ -95,6 +111,7 @@ function showBoth() {
   markdownArea.className = 'col-md-6 full-height wordwrap leftborder'
   pad.className = 'col-md-6 full-height'
 }
+showBoth()
 
 function hideInput() {
   markdownArea.className = 'col-md-6 full-height wordwrap fullwidth noborder'
@@ -174,18 +191,20 @@ function saveFile(entryfilename, data) {
 
 // loads entry from markdown file
 function loadEntry(entry) {
-  loadingentry = entry
-  if (entry === undefined) {
-    console.log('failed')
-    return 'failed'
+  if (locked == false) {
+    loadingentry = entry
+    if (entry === undefined) {
+      console.log('failed')
+      return 'failed'
+    }
+    var id = entry
+    document.getElementById('entrytitle').value = indexofentries[id][1]
+    var encrypted = indexofentries[id][3]
+    var decrypted = decryptMD(encrypted)
+    pad.value = decrypted
+    currentEntry = id
+    loadingentry = undefined
   }
-  var id = entry
-  document.getElementById('entrytitle').value = indexofentries[id][1]
-  var encrypted = indexofentries[id][3]
-  var decrypted = decryptMD(encrypted)
-  pad.value = decrypted
-  currentEntry = id
-  loadingentry = undefined
 }
 
 // creates the markdown file for an entry and adds it to the index
@@ -205,9 +224,13 @@ function createEntry(data) {
 }
 
 function createAndLoadEntry(data) {
-  createEntry(data)
-  loadEntry(indexofentries.length - 1)
-  listEntries()
+  if (locked == false) {
+    createEntry(data)
+    loadEntry(indexofentries.length - 1)
+    listEntries()
+  } else {
+    return
+  }
 }
 
 function getEntryDateRange() {
@@ -246,6 +269,50 @@ function saveEntry(data, entry, title) {
   }
 }
 
+function getListOfDates() {
+  var years = getEntryDateRange()
+  var position
+  var entrieslistdaybutton = []
+  var entrieslistdaydiv = []
+  var entrieslistdaytitlesbutton = []
+  var entrieslistdaytitlesdiv = []
+  var listdays = []
+  var daytitles = []
+  for (var ni = 0; ni < years.length; ni++) {
+    for (var nu = 0; nu < 12; nu++) {
+      for (var np = 0; np < indexofentries.length; np++) {
+        if (parseInt(indexofentries[np][0].substring(0, 4)) == years[ni]) {
+          if (parseInt(indexofentries[np][0].substring(5, 7)) == nu + 1) {
+            var daytoconv = parseInt(indexofentries[p][0].substring(8, 10))
+            var monthtoconv = parseInt(indexofentries[p][0].substring(5, 7))
+            var yeartoconv = parseInt(indexofentries[p][0].substring(0, 4))
+            var date = getFullDate(yeartoconv, monthtoconv - 1, daytoconv)
+            if (listdays.includes(date) == false) {
+              listdays.push(date)
+              position = listdays.indexOf(date)
+              daytitles.push(date)
+              daytitles[position] = []
+              entrieslistdaybutton[position] = document.createElement('button')
+              entrieslistdaybutton[position].className = 'collapsible'
+              entrieslistdaybutton[position].innerHTML = 'date'
+              entrieslistdaydiv[position] = document.createElement('div')
+              entrieslistdaydiv[position].className = 'content'
+            }
+            daytitles[position].push(indexofentries[p][1])
+            var listentry = document.createElement('button')
+            listentry.className = 'btn btn-link oneline'
+            listentry.setAttribute('onClick', 'javascript: loadEntry(parseInt(indexofentries[' + p + '][2]));')
+            listentry.innerHTML = indexofentries[p][1]
+            entrieslistdaydiv[position].appendChild(listentry)
+            entrieslistmonthdiv[u].appendChild(entrieslistdaybutton[position])
+            entrieslistmonthdiv[u].appendChild(entrieslistdaydiv[position])
+          }
+        }
+      }
+    }
+  }
+}
+
 // list entries in entriespath
 function listEntries() {
   var years = getEntryDateRange()
@@ -254,6 +321,13 @@ function listEntries() {
   var entrieslistmonthbutton = []
   var entrieslistmonthdiv = []
   var entries = []
+  var position
+  var entrieslistdaybutton = []
+  var entrieslistdaydiv = []
+  var entrieslistdaytitlesbutton = []
+  var entrieslistdaytitlesdiv = []
+  var listdays = []
+  var daytitles = []
   getEntryDateRange()
   for (i = 0; i < indexofentries.length; i++) {
     entries[i] = JSON.stringify(indexofentries[i][2]) + '-' + indexofentries[i][1]
@@ -275,14 +349,29 @@ function listEntries() {
       for (var p = 0; p < indexofentries.length; p++) {
         if (parseInt(indexofentries[p][0].substring(0, 4)) == years[i]) {
           if (parseInt(indexofentries[p][0].substring(5, 7)) == u + 1) {
-            var listentry = document.createElement('button')
-            listentry.className = 'btn btn-link'
-            listentry.setAttribute('onClick', 'javascript: loadEntry(parseInt(indexofentries[' + p + '][2]));')
             var daytoconv = parseInt(indexofentries[p][0].substring(8, 10))
             var monthtoconv = parseInt(indexofentries[p][0].substring(5, 7))
             var yeartoconv = parseInt(indexofentries[p][0].substring(0, 4))
-            listentry.innerHTML = getFullDate(yeartoconv, monthtoconv - 1, daytoconv) + '<br>' + indexofentries[p][1]
-            entrieslistmonthdiv[u].appendChild(listentry)
+            var date = getFullDate(yeartoconv, monthtoconv - 1, daytoconv)
+            if (listdays.includes(date) == false) {
+              listdays.push(date)
+              position = listdays.indexOf(date)
+              daytitles.push(date)
+              daytitles[position] = []
+              entrieslistdaybutton[position] = document.createElement('button')
+              entrieslistdaybutton[position].className = 'collapsible'
+              entrieslistdaybutton[position].innerHTML = date
+              entrieslistdaydiv[position] = document.createElement('div')
+              entrieslistdaydiv[position].className = 'content'
+            }
+            daytitles[position].push(indexofentries[p][1])
+            var listentry = document.createElement('div')
+            listentry.className = 'btn btn-link'
+            listentry.setAttribute('onClick', 'javascript: loadEntry(parseInt(indexofentries[' + p + '][2]));')
+            listentry.innerHTML = indexofentries[p][1]
+            entrieslistdaydiv[position].appendChild(listentry)
+            entrieslistmonthdiv[u].appendChild(entrieslistdaybutton[position])
+            entrieslistmonthdiv[u].appendChild(entrieslistdaydiv[position])
           }
         }
       }
@@ -304,12 +393,14 @@ function convertTextAreaToMarkdown() {
   previousMarkdownValue = markdownText
   var html = converter.makeHtml(markdownText)
   markdownArea.innerHTML = html
-  if (currentEntry === null) {
-    markdownDate()
-    createEntry(markdowndate)
-    saveEntriesIndex()
-  } else {
-    saveEntry(markdownText, currentEntry, document.getElementById('entrytitle').value)
+  if (locked == false) {
+    if (currentEntry === null) {
+      markdownDate()
+      createEntry(markdowndate)
+      saveEntriesIndex()
+    } else {
+      saveEntry(markdownText, currentEntry, document.getElementById('entrytitle').value)
+    }
   }
 }
 

@@ -25,11 +25,16 @@ html, body, section, .full-height {
 }
 
 .wordwrap {
-   white-space: pre-wrap;      /* CSS3 */
-   white-space: -moz-pre-wrap; /* Firefox */
-   white-space: -pre-wrap;     /* Opera <7 */
-   white-space: -o-pre-wrap;   /* Opera 7 */
-   word-wrap: break-word;      /* IE */
+  white-space: pre-wrap;
+  /* CSS3 */
+  white-space: -moz-pre-wrap;
+  /* Firefox */
+  white-space: -pre-wrap;
+  /* Opera <7 */
+  white-space: -o-pre-wrap;
+  /* Opera 7 */
+  word-wrap: break-word;
+  /* IE */
 }
 
 .column {
@@ -38,6 +43,7 @@ html, body, section, .full-height {
   display: inline-block;
   padding: 10px;
 }
+
 .row:after {
   content: "";
   display: table;
@@ -79,8 +85,13 @@ html, body, section, .full-height {
 }
 
 @media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
-  .sidenav a {font-size: 18px;}
+  .sidenav {
+    padding-top: 15px;
+  }
+
+  .sidenav a {
+    font-size: 18px;
+  }
 }
 
 .collapsible {
@@ -99,7 +110,7 @@ html, body, section, .full-height {
 }
 
 .content {
-  padding: 0 18px;
+  padding-left: 10px;
   display: none;
   overflow: hidden;
   background-color: #f1f1f1;
@@ -131,4 +142,9 @@ html, body, section, .full-height {
 
 .passarea {
   padding-top: 5px;
+}
+
+.oneline {
+  width: 220px;
+  text-align: left;
 }

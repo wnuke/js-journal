@@ -9,47 +9,61 @@
 </head>
 
 <body class="container-fluid">
-  <div id="pass" class="col text-center passarea">
-    <input type="password" placeholder="Password..." id="passwd">
-    <input type="button" value="Unlock" class="btn btn-default" onclick="enterPass()">
+  <div class="col text-center passarea form-group">
+    <input type="password" class"input form-control" placeholder="Password..." id="passwd">
+    <input type="button" value="Unlock or Create password" class="btn btn-default" onclick="enterPass()">
     <input type="button" value="Lock" class="btn btn-default" onclick="lock()">
   </div>
-  <div id="all">
-    <div class="sidenav">
-      <div id="sidenav">
+  <div class="sidenav">
+    <div id="sidenav">
+    </div>
+  </div>
+  <div class="main">
+    <div class="row">
+      <div class="column">
+        <h5>Title: </h5>
+      </div>
+      <div class="column">
+        <input type="text" class="form-control" id="entrytitle" placeholder="Title..." value="untitled">
+      </div>
+      <div class="column">
+        <input type="button" class="btn btn-default" value="Create Entry" onclick="createAndLoadEntry(markdowndate); loadEntry(indexofentries.length - 1)">
+      </div>
+      <div class="column">
+        <input type="button" class="btn btn-default" value="Open Search" onclick="openSearch()" id="opensearch">
+      </div>
+      <div class="column">
+        <input type="button" class="hidden" value="Close Search" onclick="closeSearch()" id="closesearch">
       </div>
     </div>
-    <div class="main">
-      <form>
-        <div class="row">
-          <div class="column">
-            <h5>Title: </h5>
-          </div>
-          <div class="column">
-            <input type="text" class="form-control" id="entrytitle" placeholder="Title..." value="untitled">
-          </div>
-          <div class="column">
-            <input type="button" class="btn btn-default" value="Create Entry" onclick="createAndLoadEntry(markdowndate); loadEntry(indexofentries.length - 1)">
-          </div>
+    <div class="container">
+      <div class="row">
+        <div class="col text-center btn-group">
+          <input type="button" class="btn btn-default" onclick="hidePreview()" value="Only Input"></input>
+          <input type="button" class="btn btn-default" onclick="showBoth()" value="Both"></input>
+          <input type="button" class="btn btn-default" onclick="hideInput()" value="Only Output"></input>
+          <br>
+          <br>
         </div>
-        <div class="container">
-          <div class="row">
-            <div class="col text-center">
-              <input type="button" class="btn btn-default" onclick="hidePreview()" value="Only Input"></input>
-              <input type="button" class="btn btn-default" onclick="showBoth()" value="Both"></input>
-              <input type="button" class="btn btn-default" onclick="hideInput()" value="Only Output"></input>
-              <br>
-              <br>
-            </div>
-          </div>
-        </div>
-        <section class="row">
-          <textarea class="col-md-6 full-height" id="pad" placeholder="Enter a title press create entry, load the entry from the bottom of the list and write here..."></textarea>
-          <div class="col-md-6 full-height wordwrap" id="markdown">
-          </div>
-        </section>
-        <script src="index.js"></script>
+      </div>
     </div>
+    <section class="row">
+      <textarea class="col-md-6 full-height" id="pad" placeholder="Enter a title press create entry, load the entry from the bottom of the list and write here..."></textarea>
+      <div class="col-md-6 full-height wordwrap" id="markdown">
+      </div>
+      <div class="hidden" id="search">
+        <div class="column">
+          <h3>Search: </h3>
+        </div>
+        <div class="column">
+          <input type="text" class="form-control" id="searchbar" placeholder="Search...">
+        </div>
+        <div class="column">
+          <input type="button" class="btn btn-default" value="Search" onclick="searchFor(document.getElementById('searchbar'))">
+        </div>
+      </div>
+    </section>
+    <script src="index.js"></script>
   </div>
 </body>
 
