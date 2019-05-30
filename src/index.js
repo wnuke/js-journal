@@ -33,7 +33,7 @@ function openSearch() {
     markdownArea.className = 'hidden'
     searchArea.className = 'col-md-6 full-height wordwrap'
     document.getElementById('opensearch').className = 'hidden'
-    document.getElementById('closesearch').className = 'btn btn-default'
+    document.getElementById('closesearch').className = 'btn btn-default leftborder'
   }
 }
 
@@ -64,27 +64,59 @@ function yesDeleteEntry() {
   document.getElementById('yesnodelbuttons').className = 'hidden'
 }
 
-/*function searchFor(query) {
-  console.log('search start')
-  var results = []
-  for (var i = 0; i < indexofentries.length; i++) {
-    console.log('2 made it')
-    var lastresultlength = results.length
-    results.push(decryptMD(indexofentries[i][3]).search(query))
-    if (lastresultlength == results.length) {
-      console.log('all of ' + i + ' checked: ')
-    }
-  }
-  console.log(results)
-}*/
-
-
 function closeSearch() {
   markdownArea.className = 'col-md-6 full-height wordwrap'
   searchArea.className = 'hidden'
   document.getElementById('closesearch').className = 'hidden'
   document.getElementById('opensearch').className = 'btn btn-default'
   showBoth()
+}
+
+function searchIndex(query) {
+  var results = []
+  var isFirstCheck = true
+  var location
+  for (var i = 0; i < indexofentries.length; i++) {
+    var decryptedentry = decryptMD(indexofentries[i][3])
+    var checkWholeArray = false
+    while (checkWholeArray == false) {
+      if (isFirstCheck == true) {
+        isFirstCheck = false
+        location = decryptedentry.indexOf(query)
+        if (location == -1) {
+          checkWholeArray = true
+        } else {
+          results.push(document.createElement('p'))
+          results[results.length -1].innerHTML = 'In entry <div class="btn btn-link onclick="loadEntry(' + i + ')">' + indexofentries[i][0] + '-' + indexofentries[i][1] + '</div>: ...' + decryptedentry.substr(location - 7, 7) + query.toUpperCase() + decryptedentry.substr(location + query.length, 20) + '...'
+        }
+      } else {
+        var startloc = location + query.length
+        location = decryptedentry.indexOf(query, startloc)
+        if (location == -1) {
+          checkWholeArray = true
+        } else {
+          results.push(document.createElement('p'))
+          results[results.length -1].innerHTML = 'In entry <div class="btn btn-link onclick="loadEntry(' + i + ')">' + indexofentries[i][0] + '-' + indexofentries[i][1] + '</div>: ...' + decryptedentry.substr(location - 7, 7) + query.toUpperCase() + decryptedentry.substr(location + query.length, 20) + '...'
+        }
+      }
+    }
+  }
+  return results
+}
+
+function createElementFromHTML(htmlString) {
+  var div = document.createElement('div');
+  div.innerHTML = htmlString
+  return div.childNodes;
+}
+
+function showSearchResults(query) {
+  var sresults = searchIndex(query)
+  var resultdisp = document.getElementById('searchresults')
+  resultdisp.innerHTML = ''
+  for (var i = 0; i < sresults.length; i++) {
+    resultdisp.appendChild(sresults[i])
+  }
 }
 
 function makeCollapse() {
@@ -310,50 +342,6 @@ function saveEntry(data, entry, title) {
     return
   } else {
     return
-  }
-}
-
-function getListOfDates() {
-  var years = getEntryDateRange()
-  var position
-  var entrieslistdaybutton = []
-  var entrieslistdaydiv = []
-  var entrieslistdaytitlesbutton = []
-  var entrieslistdaytitlesdiv = []
-  var listdays = []
-  var daytitles = []
-  for (var ni = 0; ni < years.length; ni++) {
-    for (var nu = 0; nu < 12; nu++) {
-      for (var np = 0; np < indexofentries.length; np++) {
-        if (parseInt(indexofentries[np][0].substring(0, 4)) == years[ni]) {
-          if (parseInt(indexofentries[np][0].substring(5, 7)) == nu + 1) {
-            var daytoconv = parseInt(indexofentries[p][0].substring(8, 10))
-            var monthtoconv = parseInt(indexofentries[p][0].substring(5, 7))
-            var yeartoconv = parseInt(indexofentries[p][0].substring(0, 4))
-            var date = getFullDate(yeartoconv, monthtoconv - 1, daytoconv)
-            if (listdays.includes(date) == false) {
-              listdays.push(date)
-              position = listdays.indexOf(date)
-              daytitles.push(date)
-              daytitles[position] = []
-              entrieslistdaybutton[position] = document.createElement('button')
-              entrieslistdaybutton[position].className = 'collapsible'
-              entrieslistdaybutton[position].innerHTML = 'date'
-              entrieslistdaydiv[position] = document.createElement('div')
-              entrieslistdaydiv[position].className = 'content'
-            }
-            daytitles[position].push(indexofentries[p][1])
-            var listentry = document.createElement('button')
-            listentry.className = 'btn btn-link oneline'
-            listentry.setAttribute('onClick', 'javascript: loadEntry(parseInt(indexofentries[' + p + '][2]));')
-            listentry.innerHTML = indexofentries[p][1]
-            entrieslistdaydiv[position].appendChild(listentry)
-            entrieslistmonthdiv[u].appendChild(entrieslistdaybutton[position])
-            entrieslistmonthdiv[u].appendChild(entrieslistdaydiv[position])
-          }
-        }
-      }
-    }
   }
 }
 

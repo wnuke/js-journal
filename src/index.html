@@ -37,8 +37,8 @@
           <p>Are you sure? </p>
         </div>
         <div class="column btn-group">
-          <input type="button" class="btn btn-danger" value="Yes" onclick="yesDeleteEntry()">
-          <input type="button" class="btn btn-success" value="No" onclick="notDeleteEntry()">
+          <input type="button" class="btn btn-danger" value="No" onclick="notDeleteEntry()">
+          <input type="button" class="btn btn-success" value="Yes" onclick="yesDeleteEntry()">
         </div>
       </div>
       <div class="column">
@@ -52,9 +52,9 @@
           <input type="button" class="btn btn-default" onclick="hidePreview()" value="Only Input"></input>
           <input type="button" class="btn btn-default" onclick="showBoth()" value="Both"></input>
           <input type="button" class="btn btn-default" onclick="hideInput()" value="Only Output"></input>
-          <br>
-          <br>
         </div>
+        <br>
+        <br>
       </div>
     </div>
     <section class="row">
@@ -69,8 +69,13 @@
           <input type="text" class="form-control" id="searchbar" placeholder="Search...">
         </div>
         <div class="column">
-          <input type="button" class="btn btn-default" value="Search" onclick="searchFor(document.getElementById('searchbar'))">
+          <input type="button" class="btn btn-default" value="Search" onclick="showSearchResults(document.getElementById('searchbar').value)">
         </div>
+        <br>
+        <section class="row">
+          <div id="searchresults">
+          </div>
+        </section>
       </div>
     </section>
     <script src="index.js"></script>
