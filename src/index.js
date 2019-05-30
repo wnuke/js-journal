@@ -51,10 +51,15 @@ function notDeleteEntry() {
 
 function yesDeleteEntry() {
   indexofentries.splice(currentEntry, 1)
+  pad.value = ''
+  markdownArea.innerHTML = ''
+  document.getElementById('entrytitle').value = 'untitled'
   saveEntriesIndex()
   listEntries()
   currentEntry = currentEntry - 1
-  loadEntry(currentEntry)
+  if (indexofentries.length > 0) {
+    loadEntry(currentEntry)
+  }
   document.getElementById('deletebutton').className = 'column'
   document.getElementById('yesnodelbuttons').className = 'hidden'
 }
