@@ -29,11 +29,50 @@ var locked = true
 Intl.DateTimeFormat().resolvedOptions().timeZone
 
 function openSearch() {
-  markdownArea.className = 'hidden'
-  searchArea.className = 'col-md-6 full-height wordwrap'
-  document.getElementById('opensearch').className = 'hidden'
-  document.getElementById('closesearch').className = 'btn btn-default'
+  if (locked == false) {
+    markdownArea.className = 'hidden'
+    searchArea.className = 'col-md-6 full-height wordwrap'
+    document.getElementById('opensearch').className = 'hidden'
+    document.getElementById('closesearch').className = 'btn btn-default'
+  }
 }
+
+function deleteEntry() {
+  if (locked == false) {
+    document.getElementById('deletebutton').className = 'hidden'
+    document.getElementById('yesnodelbuttons').className = 'column'
+  }
+}
+
+function notDeleteEntry() {
+  document.getElementById('deletebutton').className = 'column'
+  document.getElementById('yesnodelbuttons').className = 'hidden'
+}
+
+function yesDeleteEntry() {
+  indexofentries.splice(currentEntry, 1)
+  saveEntriesIndex()
+  listEntries()
+  currentEntry = currentEntry - 1
+  loadEntry(currentEntry)
+  document.getElementById('deletebutton').className = 'column'
+  document.getElementById('yesnodelbuttons').className = 'hidden'
+}
+
+/*function searchFor(query) {
+  console.log('search start')
+  var results = []
+  for (var i = 0; i < indexofentries.length; i++) {
+    console.log('2 made it')
+    var lastresultlength = results.length
+    results.push(decryptMD(indexofentries[i][3]).search(query))
+    if (lastresultlength == results.length) {
+      console.log('all of ' + i + ' checked: ')
+    }
+  }
+  console.log(results)
+}*/
+
 
 function closeSearch() {
   markdownArea.className = 'col-md-6 full-height wordwrap'

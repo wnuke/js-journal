@@ -29,10 +29,20 @@
       <div class="column">
         <input type="button" class="btn btn-default" value="Create Entry" onclick="createAndLoadEntry(markdowndate); loadEntry(indexofentries.length - 1)">
       </div>
-      <div class="column">
-        <input type="button" class="btn btn-default" value="Open Search" onclick="openSearch()" id="opensearch">
+      <div class="column" id="deletebutton">
+        <input type="button" class="btn btn-default" value="Delete Entry" onclick="deleteEntry()">
+      </div>
+      <div id="yesnodelbuttons" class="hidden">
+        <div class="column">
+          <p>Are you sure? </p>
+        </div>
+        <div class="column btn-group">
+          <input type="button" class="btn btn-danger" value="Yes" onclick="yesDeleteEntry()">
+          <input type="button" class="btn btn-success" value="No" onclick="notDeleteEntry()">
+        </div>
       </div>
       <div class="column">
+        <input type="button" class="btn btn-default" value="Open Search" onclick="openSearch()" id="opensearch">
         <input type="button" class="hidden" value="Close Search" onclick="closeSearch()" id="closesearch">
       </div>
     </div>
