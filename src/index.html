@@ -7,39 +7,49 @@
   <link href="bootstrap.min.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
 </head>
+
 <body class="container-fluid">
-  <div class="sidenav" id="sidenav">
+  <div id="pass" class="col text-center passarea">
+    <input type="password" placeholder="Password..." id="passwd">
+    <input type="button" value="Unlock" class="btn btn-default" onclick="enterPass()">
+    <input type="button" value="Lock" class="btn btn-default" onclick="lock()">
   </div>
-  <div class="main">
-    <form>
-      <div class="row">
-        <div class="column">
-          <h5>Title: </h5>
-        </div>
-        <div class="column">
-          <input type="text" class="form-control" id="entrytitle" placeholder="Title..." value="untitled">
-        </div>
-        <div class="column">
-          <input type="button" class="btn btn-default" value="Create Entry" onclick="createAndLoadEntry(markdowndate); loadEntry(indexofentries.length - 1)">
-        </div>
+  <div id="all">
+    <div class="sidenav">
+      <div id="sidenav">
       </div>
-      <div class="container">
+    </div>
+    <div class="main">
+      <form>
         <div class="row">
-          <div class="col text-center">
-            <input type="button" class="btn btn-default" onclick="hidePreview()" value="Only Input"></input>
-            <input type="button" class="btn btn-default" onclick="showBoth()" value="Both"></input>
-            <input type="button" class="btn btn-default" onclick="hideInput()" value="Only Output"></input>
-            <br>
-            <br>
+          <div class="column">
+            <h5>Title: </h5>
+          </div>
+          <div class="column">
+            <input type="text" class="form-control" id="entrytitle" placeholder="Title..." value="untitled">
+          </div>
+          <div class="column">
+            <input type="button" class="btn btn-default" value="Create Entry" onclick="createAndLoadEntry(markdowndate); loadEntry(indexofentries.length - 1)">
           </div>
         </div>
-      </div>
-      <section class="row">
-        <textarea class="col-md-6 full-height" id="pad" placeholder="Enter a title press create entry, load the entry from the bottom of the list and write here..."></textarea>
-        <div class="col-md-6 full-height wordwrap" id="markdown">
+        <div class="container">
+          <div class="row">
+            <div class="col text-center">
+              <input type="button" class="btn btn-default" onclick="hidePreview()" value="Only Input"></input>
+              <input type="button" class="btn btn-default" onclick="showBoth()" value="Both"></input>
+              <input type="button" class="btn btn-default" onclick="hideInput()" value="Only Output"></input>
+              <br>
+              <br>
+            </div>
+          </div>
         </div>
-      </section>
-      <script src="index.js"></script>
+        <section class="row">
+          <textarea class="col-md-6 full-height" id="pad" placeholder="Enter a title press create entry, load the entry from the bottom of the list and write here..."></textarea>
+          <div class="col-md-6 full-height wordwrap" id="markdown">
+          </div>
+        </section>
+        <script src="index.js"></script>
+    </div>
   </div>
 </body>
 

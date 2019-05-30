@@ -8,11 +8,11 @@ var showdown = require('showdown')
 var converter = new showdown.Converter()
 var pad = document.getElementById('pad')
 var markdownArea = document.getElementById('markdown')
-var mainArea = document.getElementById('main')
+var mainArea = document.getElementById('all')
 var passArea = document.getElementById('pass')
 var indexofentriespath = path + '/index-of-entries.json'
 var indexofentries = []
-var indexofentriesArray
+var indexofEntriesArray
 var currentEntry = null
 var d = new Date();
 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -20,11 +20,12 @@ var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 var nowdate
 var nowday
 var nowmonth
-var password = 'test'
+var password
 var nowyear
 var markdowndate
 var loadingentry
 var newid
+var locked = true
 
 Intl.DateTimeFormat().resolvedOptions().timeZone
 
@@ -43,6 +44,46 @@ function makeCollapse() {
       }
     });
   }
+}
+
+function enterPass() {
+  password = document.getElementById('passwd').value
+  loadEntriesFile()
+  entriesFileToArray()
+  listEntries()
+  locked = false
+}
+
+
+function loadEntriesFile() {
+  // check if the list of entries already exists if not then create it
+  try {
+    indexofentriesArray = require(indexofentriespath)
+  } catch (e) {
+    if (e.code == 'MODULE_NOT_FOUND') {
+      saveEntriesIndex()
+    } else {
+      indexofentriesArray = require(indexofentriespath)
+      listEntries()
+    }
+  }
+}
+
+function entriesFileToArray() {
+  // load json list into js array
+  for (var i in indexofentriesArray) {
+    if (indexofentriesArray.hasOwnProperty(i) && !isNaN(+i)) {
+      indexofentries[+i] = indexofentriesArray[i];
+      console.log('loaded')
+    }
+  }
+}
+
+function lock() {
+  password = null
+  locked = true
+  pad.value = ''
+  document.getElementById('entrytitle').value = 'untitled'
 }
 
 function hidePreview() {
@@ -118,24 +159,6 @@ function saveEntriesIndex() {
   })
 }
 
-// check if the list of entries already exists if not then create it
-try {
-  indexofentriesArray = require(indexofentriespath)
-} catch (e) {
-  if (e.code == 'MODULE_NOT_FOUND') {
-    saveEntriesIndex()
-  } else {
-    indexofentriesArray = require(indexofentriespath)
-  }
-}
-
-// load json list into js array
-for (var i in indexofentriesArray) {
-  if (indexofentriesArray.hasOwnProperty(i) && !isNaN(+i)) {
-    indexofentries[+i] = indexofentriesArray[i];
-  }
-}
-
 // create save directory if it doesn't exist
 fs.promises.mkdir(path, {
   "recursive": true
@@ -177,7 +200,7 @@ function createEntry(data) {
   indexofentries.push(entryarray)
   currentEntry = newid
   markdownDate()
-  saveEntry(markdowndate, newid)
+  saveEntry(markdowndate, newid, entrytitle)
   listEntries()
 }
 
@@ -212,9 +235,15 @@ function decryptMD(mdtodecrypt) {
   return originalText
 }
 
-function saveEntry(data, entry) {
-  indexofentries[entry][3] = encryptMD(data)
-  saveEntriesIndex()
+function saveEntry(data, entry, title) {
+  if (locked == false) {
+    indexofentries[entry][1] = title
+    indexofentries[entry][3] = encryptMD(data)
+    saveEntriesIndex()
+    return
+  } else {
+    return
+  }
 }
 
 // list entries in entriespath
@@ -252,7 +281,7 @@ function listEntries() {
             var daytoconv = parseInt(indexofentries[p][0].substring(8, 10))
             var monthtoconv = parseInt(indexofentries[p][0].substring(5, 7))
             var yeartoconv = parseInt(indexofentries[p][0].substring(0, 4))
-            listentry.innerHTML = getFullDate(yeartoconv, monthtoconv, daytoconv)
+            listentry.innerHTML = getFullDate(yeartoconv, monthtoconv - 1, daytoconv) + '<br>' + indexofentries[p][1]
             entrieslistmonthdiv[u].appendChild(listentry)
           }
         }
@@ -280,7 +309,7 @@ function convertTextAreaToMarkdown() {
     createEntry(markdowndate)
     saveEntriesIndex()
   } else {
-    saveEntry(markdownText, currentEntry)
+    saveEntry(markdownText, currentEntry, document.getElementById('entrytitle').value)
   }
 }
 

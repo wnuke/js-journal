@@ -12,12 +12,16 @@ html, body, section, .full-height {
   -moz-box-shadow: none;
   box-shadow: none;
   overflow: auto;
-  min-height: 700px;
+  height: 90vh;
+  vertical-align: bottom;
+  display: inline-block;
 }
 
 #markdown {
-  overflow: auto;
-  height: 100%;
+  overflow: scroll;
+  height: 90vh;
+  vertical-align: bottom;
+  display: inline-block;
 }
 
 .wordwrap {
@@ -123,4 +127,8 @@ html, body, section, .full-height {
 
 .leftborder {
   border-left: 1px solid black;
+}
+
+.passarea {
+  padding-top: 5px;
 }
