@@ -3,7 +3,7 @@ const {
 } = require('electron').remote
 var fs = require('fs')
 var CryptoJS = require("crypto-js");
-var path = app.getPath('appData') + '/js-journal'
+var path = app.getPath('appData') + '/JS Journal/Local Storage'
 var showdown = require('showdown')
 var converter = new showdown.Converter()
 var pad = document.getElementById('pad')
@@ -88,7 +88,7 @@ function searchIndex(query) {
           checkWholeArray = true
         } else {
           results.push(document.createElement('p'))
-          results[results.length - 1].innerHTML = 'In entry <div class="btn btn-link onclick="loadEntry(' + i + ')">' + indexofentries[i][0] + '-' + indexofentries[i][1] + '</div>: ...' + decryptedentry.substr(location - 7, 7) + query.toUpperCase() + decryptedentry.substr(location + query.length, 20) + '...'
+          results[results.length - 1].innerHTML = 'In entry<div class="btn btn-link" onclick="loadEntry(' + i + ')">' + indexofentries[i][0] + '-' + indexofentries[i][1] + '</div>: ...' + decryptedentry.substr(location - 7, 7) + '<b style="color:#6EAAD2;">' + query + '</b>' + decryptedentry.substr(location + query.length, 20) + '...'
         }
       } else {
         var startloc = location + query.length
@@ -97,7 +97,7 @@ function searchIndex(query) {
           checkWholeArray = true
         } else {
           results.push(document.createElement('p'))
-          results[results.length - 1].innerHTML = 'In entry <div class="btn btn-link onclick="loadEntry(' + i + ')">' + indexofentries[i][0] + '-' + indexofentries[i][1] + '</div>: ...' + decryptedentry.substr(location - 7, 7) + query.toUpperCase() + decryptedentry.substr(location + query.length, 20) + '...'
+          results[results.length - 1].innerHTML = 'In entry<div class="btn btn-link" onclick="loadEntry(' + i + ')">' + indexofentries[i][0] + '-' + indexofentries[i][1] + '</div>: ...' + decryptedentry.substr(location - 7, 7) + '<b style="color:#6EAAD2;">' + query + '</b>' + decryptedentry.substr(location + query.length, 20) + '...'
         }
       }
     }
@@ -204,7 +204,7 @@ function makeTwoDig(number) {
 }
 
 function markdownDate(year, month, day) {
-  var mdd = new Date(year, month, day)
+  var mdd = new Date(year, month - 1, day)
   var mddatestr = '<p style="display:none">' + year + '-' + month + '-' + day + '</p>'
   var mdyear = '<h1 style="color:#6EAAD2;line-height: 0px;">' + year + '</span><br>'
   var mddate = '<h2 style="color:#AAAAAA;line-height: 10px;">' + days[mdd.getDay()] + ' ' + day + ' ' + months[mdd.getMonth()] + '</span><br>'
@@ -289,8 +289,6 @@ function loadEntry(entry) {
 
 // creates the markdown file for an entry and adds it to the index
 function createEntry(data) {
-  //getTodayDate()
-  //markdownDate()
   var entrydate
   var entrydatestr
   if (entrydateinput.value == '') {
@@ -299,7 +297,7 @@ function createEntry(data) {
   } else {
     entrydate = entrydateinput.value
     var datefrominput = entrydateinput.value.split('-')
-    entrydatestr = markdownDate(parseInt(datefrominput[0]), parseInt(datefrominput[1]), parseInt(datefrominput[2]))
+    entrydatestr = markdownDate(datefrominput[0], datefrominput[1], datefrominput[2])
   }
   var entrytitle = document.getElementById('entrytitle').value
   var entryarray = []
@@ -314,7 +312,6 @@ function createEntry(data) {
 function createAndLoadEntry(data) {
   if (locked == false) {
     createEntry(data)
-    loadEntry(indexofentries.length - 1)
     listEntries()
   } else {
     return
@@ -351,13 +348,14 @@ var mddatedatastring
 function saveEntry(data, entry, title) {
   if (locked == false) {
     var entrydate = data.substr(24, 10)
-    indexofentries[entry][0] = entrydate
     entrydate = entrydate.split('-')
+    indexofentries[entry][0] = entrydate[0] + '-' + entrydate[1] + '-' + entrydate[2]
     mddatedatastring = data.substring(0, data.indexOf('thisisamarker') + 15)
     data.replace(mddatedatastring, markdownDate(parseInt(entrydate[0]), parseInt(entrydate[1]), parseInt(entrydate[2])))
     indexofentries[entry][1] = title
     indexofentries[entry][3] = encryptMD(data)
     saveEntriesIndex()
+    loadEntry(currentEntry)
     return
   } else {
     return
