@@ -27,12 +27,15 @@
         <input type="text" class="form-control" id="entrytitle" placeholder="Title..." value="untitled">
       </div>
       <div class="column">
+        <input type="date" class="form-control" id="entrydate">
+      </div>
+      <div class="column">
         <input type="button" class="btn btn-default" value="Create Entry" onclick="createAndLoadEntry(markdowndate); loadEntry(indexofentries.length - 1)">
       </div>
-      <div class="column" id="deletebutton">
+      <div class="column leftborder" id="deletebutton">
         <input type="button" class="btn btn-default" value="Delete Entry" onclick="deleteEntry()">
       </div>
-      <div id="yesnodelbuttons" class="hidden">
+      <div id="yesnodelbuttons" class="hidden leftborder">
         <div class="column">
           <p>Are you sure? </p>
         </div>
@@ -41,7 +44,7 @@
           <input type="button" class="btn btn-success" value="Yes" onclick="yesDeleteEntry()">
         </div>
       </div>
-      <div class="column">
+      <div class="column leftborder">
         <input type="button" class="btn btn-default" value="Open Search" onclick="openSearch()" id="opensearch">
         <input type="button" class="hidden" value="Close Search" onclick="closeSearch()" id="closesearch">
       </div>

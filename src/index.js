@@ -24,6 +24,7 @@ var nowyear
 var markdowndate
 var loadingentry
 var newid
+var entrydateinput = document.getElementById('entrydate')
 var locked = true
 
 Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -87,7 +88,7 @@ function searchIndex(query) {
           checkWholeArray = true
         } else {
           results.push(document.createElement('p'))
-          results[results.length -1].innerHTML = 'In entry <div class="btn btn-link onclick="loadEntry(' + i + ')">' + indexofentries[i][0] + '-' + indexofentries[i][1] + '</div>: ...' + decryptedentry.substr(location - 7, 7) + query.toUpperCase() + decryptedentry.substr(location + query.length, 20) + '...'
+          results[results.length - 1].innerHTML = 'In entry <div class="btn btn-link onclick="loadEntry(' + i + ')">' + indexofentries[i][0] + '-' + indexofentries[i][1] + '</div>: ...' + decryptedentry.substr(location - 7, 7) + query.toUpperCase() + decryptedentry.substr(location + query.length, 20) + '...'
         }
       } else {
         var startloc = location + query.length
@@ -96,7 +97,7 @@ function searchIndex(query) {
           checkWholeArray = true
         } else {
           results.push(document.createElement('p'))
-          results[results.length -1].innerHTML = 'In entry <div class="btn btn-link onclick="loadEntry(' + i + ')">' + indexofentries[i][0] + '-' + indexofentries[i][1] + '</div>: ...' + decryptedentry.substr(location - 7, 7) + query.toUpperCase() + decryptedentry.substr(location + query.length, 20) + '...'
+          results[results.length - 1].innerHTML = 'In entry <div class="btn btn-link onclick="loadEntry(' + i + ')">' + indexofentries[i][0] + '-' + indexofentries[i][1] + '</div>: ...' + decryptedentry.substr(location - 7, 7) + query.toUpperCase() + decryptedentry.substr(location + query.length, 20) + '...'
         }
       }
     }
@@ -202,11 +203,13 @@ function makeTwoDig(number) {
   }
 }
 
-function markdownDate() {
-  var mdyear = '<h1 style="color:#6EAAD2;line-height: 0px;">' + d.getFullYear() + '</span><br>'
-  var mddate = '<h2 style="color:#AAAAAA;line-height: 10px;">' + days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()] + '</span><br>'
-  var mdtime = '<h6 style="color:#000000;line-height: 10px;">' + makeTwoDig(d.getHours()) + ':' + makeTwoDig(d.getMinutes()) + ' ' + Intl.DateTimeFormat().resolvedOptions().timeZone + '</span><br>'
-  markdowndate = mdyear + mddate + mdtime
+function markdownDate(year, month, day) {
+  var mdd = new Date(year, month, day)
+  var mddatestr = '<p style="display:none">' + year + '-' + month + '-' + day + '</p>'
+  var mdyear = '<h1 style="color:#6EAAD2;line-height: 0px;">' + year + '</span><br>'
+  var mddate = '<h2 style="color:#AAAAAA;line-height: 10px;">' + days[mdd.getDay()] + ' ' + day + ' ' + months[mdd.getMonth()] + '</span><br>'
+  var mdtime = '<h6 style="color:#000000;line-height: 10px;">' + makeTwoDig(d.getHours()) + ':' + makeTwoDig(d.getMinutes()) + ' ' + Intl.DateTimeFormat().resolvedOptions().timeZone + '</span><br id="thisisamarker">'
+  return mddatestr + mdyear + mddate + mdtime
 }
 
 
@@ -214,7 +217,8 @@ function getTodayDate() {
   nowday = JSON.stringify(makeTwoDig(d.getDate()))
   nowmonth = makeTwoDig(d.getMonth() + 1)
   nowyear = JSON.stringify(d.getFullYear())
-  nowdate = nowyear + '-' + nowmonth + '-' + nowday
+  nowdate = [nowyear, nowmonth, nowday]
+  return nowdate
 }
 getTodayDate()
 
@@ -285,17 +289,25 @@ function loadEntry(entry) {
 
 // creates the markdown file for an entry and adds it to the index
 function createEntry(data) {
-  getTodayDate()
-  markdownDate()
+  //getTodayDate()
+  //markdownDate()
+  var entrydate
+  var entrydatestr
+  if (entrydateinput.value == '') {
+    entrydate = getTodayDate()
+    entrydatestr = markdownDate(entrydate[0], entrydate[1], entrydate[2])
+  } else {
+    entrydate = entrydateinput.value
+    var datefrominput = entrydateinput.value.split('-')
+    entrydatestr = markdownDate(parseInt(datefrominput[0]), parseInt(datefrominput[1]), parseInt(datefrominput[2]))
+  }
   var entrytitle = document.getElementById('entrytitle').value
-  var entrydate = nowdate
   var entryarray = []
   newid = indexofentries.length
-  entryarray = [entrydate, entrytitle, newid, markdowndate]
+  entryarray = [entrydate, entrytitle, newid, entrydatestr]
   indexofentries.push(entryarray)
   currentEntry = newid
-  markdownDate()
-  saveEntry(markdowndate, newid, entrytitle)
+  saveEntry(entrydatestr, newid, entrytitle)
   listEntries()
 }
 
@@ -334,8 +346,15 @@ function decryptMD(mdtodecrypt) {
   return originalText
 }
 
+var mddatedatastring
+
 function saveEntry(data, entry, title) {
   if (locked == false) {
+    var entrydate = data.substr(24, 10)
+    indexofentries[entry][0] = entrydate
+    entrydate = entrydate.split('-')
+    mddatedatastring = data.substring(0, data.indexOf('thisisamarker') + 15)
+    data.replace(mddatedatastring, markdownDate(parseInt(entrydate[0]), parseInt(entrydate[1]), parseInt(entrydate[2])))
     indexofentries[entry][1] = title
     indexofentries[entry][3] = encryptMD(data)
     saveEntriesIndex()
