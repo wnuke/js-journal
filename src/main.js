@@ -17,7 +17,7 @@ function createWindow() {
     "webPreferences": {
       "nodeIntegration": true
     },
-    "width": 950
+    "width": 1200
   })
   /*eslint-disable */
   mainWindow.webContents.on('new-window', function(e, url) {
