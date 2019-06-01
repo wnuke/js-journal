@@ -29,6 +29,16 @@ var locked = true
 
 Intl.DateTimeFormat().resolvedOptions().timeZone
 
+function textOnEnterDoOnClick(input, button) {
+  input.addEventListener("keypress", function(event) {
+    if (event.keyCode == 13)
+      button.click()
+  })
+}
+
+textOnEnterDoOnClick(document.getElementById('passwd'), document.getElementById('entercreatepassbtn'))
+textOnEnterDoOnClick(document.getElementById('entrytitle'), document.getElementById('createentrybtn'))
+
 function openSearch() {
   if (locked == false) {
     markdownArea.className = 'hidden'
@@ -246,7 +256,6 @@ function makeTwoDig(number) {
 function saveEntriesIndex() {
   var indexofentriesJSON = Object.assign({}, indexofentries)
   var indexofentriesJSONstring = JSON.stringify(indexofentriesJSON)
-
   fs.writeFile(indexofentriespath, indexofentriesJSONstring, (err) => {
     if (err) {
       // console.log('An error ocurred creating the JSON file ' + err.message)

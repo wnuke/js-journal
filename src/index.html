@@ -11,7 +11,7 @@
 <body class="container-fluid">
   <div class="col text-center passarea form-group">
     <input type="password" class"input form-control" placeholder="Password..." id="passwd">
-    <input type="button" value="Unlock or Create password" class="btn btn-default" onclick="enterPass()">
+    <input type="button" value="Unlock or Create password" class="btn btn-default" onclick="enterPass()" id="entercreatepassbtn">
     <input type="button" value="Lock" class="btn btn-default" onclick="lock()">
     <input type="button" value="Reload Sidebar" class="btn btn-default" onclick="listEntries()">
   </div>
@@ -31,7 +31,7 @@
         <input type="date" class="form-control" id="entrydate">
       </div>
       <div class="column">
-        <input type="button" class="btn btn-default" value="Create Entry" onclick="createAndLoadEntry(markdowndate); loadEntry(indexofentries.length - 1)">
+        <input type="button" class="btn btn-default" value="Create Entry" onclick="createAndLoadEntry(markdowndate); loadEntry(indexofentries.length - 1)" id="createentrybtn">
       </div>
       <div class="column leftborder" id="deletebutton">
         <input type="button" class="btn btn-default" value="Delete Entry" onclick="deleteEntry()">
