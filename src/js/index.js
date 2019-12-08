@@ -50,6 +50,9 @@ const app = remote.app;
 const fs = require('fs');
 var CryptoJS = require("crypto-js");
 
+var passcheck = 'This is some random text that tests wether or not the password is correct.'
+var appDataPath = app.getPath('userData') + '/journal'
+var passcheckPath = appDataPath + '/passcheck'
 var password
 var passwordisset = false
 
@@ -68,39 +71,79 @@ fs.promises.access(app.getPath('userData'), fs.constants.R_OK | fs.constants.W_O
 
 // end permissions check <----------
 
-// Check if user has already registered / created a journal ----->
+// Check if user has already registered / created a journal and if not create basic dir tree and make user set password ----->
 
 var hasregistered
 
-if (fs.existsSync(app.getPath('userData')+'/journal/passcheck')) {
+if (fs.existsSync(passcheckPath)) {
   hasregistered = true
 } else {
   hasregistered = false
+  if (fs.existsSync(appDataPath) == false) {
+    fs.mkdirSync(appDataPath)
+  }
+}
+
+function checkAndRegPass() {
+  if ($('#passwdr').val() == $('#passwdv').val() && $('#passwdr').hasClass('is-invalid') == false && $('#passwdv').hasClass('is-invalid') == false) {
+    password = $('#passwdr').val()
+    writeFile(passcheckPath, passcheck, password)
+    location.reload()
+  }
+}
+
+if (hasregistered == false) {
+  $('#main').load('html/register.html')
+  $('#passwdv').keypress(function (event) {
+    if (event.which == 13) {
+      checkAndRegPass()
+    }
+  });
 }
 
 // end registered check <--------
 
+// login ---->
+
+if (hasregistered == true) {
+  $('#main').load('html/login.html')
+  $(document).ready(function ($) {
+    $('#passwd').keypress(function (event) {
+      if (event.which == 13) {
+        login()
+      }
+    });
+
+    $('#passwd').on('input', function () {
+      $('#passwd-invalid').hide()
+      $('#passwd').removeClass('is-invalid')
+    });
+  })
+}
+
 function login() {
   password = $('#passwd').val()
-  if (passwordisset == false && password != '') {
+  if (passwordisset == false && password != undefined && readFile(passcheckPath, password) == passcheck) {
     passwordisset = true
+    $('#main').load('html/journal.html')
+  } else {
+    password = ''
+    $('#passwd').val('')
+    $('#passwd-invalid').show()
+    $('#passwd').addClass('is-invalid')
   }
 }
 
-$("#passwd").keypress(function (event) {
-  if (event.which == 13) {
-    login()
-  }
-});
+// login end <----
 
-function readFile(filepath) {
-  textencrypted = fs.readFileSync(filepath, 'utf-8')
-  textdecrypted = CryptoJS.AES.decrypt(textencrypted, password)
+function readFile(filepath, pass) {
+  textencrypted = fs.readFileSync(filepath, 'utf-8').toString()
+  textdecrypted = CryptoJS.AES.decrypt(textencrypted, pass)
   textutf8 = textdecrypted.toString(CryptoJS.enc.Utf8)
   return textutf8
 }
 
-function writeFile(filepath, content) {
-  textencrypted = CryptoJS.AES.encrypt(content, password).toString()
-  fs.writeFileSync(filepath, content)
+function writeFile(filepath, content, pass) {
+  textencrypted = CryptoJS.AES.encrypt(content, pass).toString()
+  fs.writeFileSync(filepath, textencrypted)
 }
