@@ -4,16 +4,28 @@
 <head>
   <meta charset="UTF-8">
   <title>JS Journal</title>
-  <link href="css/bootstrap.min.css" rel="stylesheet">
-  <link href="css/bootstrap-grid.min.css" rel="stylesheet">
-  <link href="css/bootstrap-reboot.min.css" rel="stylesheet">
   <link href="css/style.css" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="./css/bootstrap.min.css" />
+  <!-- Bootstrap Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script>let $ = require('jquery');</script>
+  <script>require('popper.js');</script>
+  <script>require('bootstrap');</script>
 </head>
 
 <body class="container-fluid">
+  <div>
+    <input type="button" value="prevfile" id="prevbtn">
+    <input type="button" value="nextfile" id="nextbtn">
+    <input type="text" id="passwd">
+  </div>
+  <div>
+    <p id="text">
+      text here
+    </p>
+  </div>
   <script src="js/index.js"></script>
-  <script src="js/bootstrap.bundle.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
 </body>
 
 </html>
