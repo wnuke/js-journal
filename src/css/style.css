@@ -1,3 +1,15 @@
+html, body {
+  height: 100%;
+}
+.vertical-center {
+  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+  min-height: 100vh; /* These two lines are counted as one :-)       */
+
+  display: flex;
+  align-items: center;
+}
+
+/*
 html, body, section, .full-height {
   height: 100%;
 }
@@ -26,15 +38,15 @@ html, body, section, .full-height {
 
 .wordwrap {
   white-space: pre-wrap;
-  /* CSS3 */
+  /* CSS3 *//*
   white-space: -moz-pre-wrap;
-  /* Firefox */
+  /* Firefox *//*
   white-space: -pre-wrap;
-  /* Opera <7 */
+  /* Opera <7 *//*
   white-space: -o-pre-wrap;
-  /* Opera 7 */
+  /* Opera 7 *//*
   word-wrap: break-word;
-  /* IE */
+  /* IE *//*
 }
 
 .column {
@@ -148,3 +160,4 @@ html, body, section, .full-height {
   width: 220px;
   text-align: left;
 }
+*/

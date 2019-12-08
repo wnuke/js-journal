@@ -44,17 +44,35 @@ function getFullDate(year, month, day) {
 }
 // end date <---------
 
+// general variables and functions ---->
+
 const remote = require('electron').remote;
 const app = remote.app;
 
 const fs = require('fs');
 var CryptoJS = require("crypto-js");
 
-var passcheck = 'This is some random text that tests wether or not the password is correct.'
 var appDataPath = app.getPath('userData') + '/journal'
 var passcheckPath = appDataPath + '/passcheck'
+var entriesfolder = appDataPath + '/entries'
+
 var password
-var passwordisset = false
+var unlocked = false
+var passcheck = 'This is some random text that tests wether or not the password is correct.'
+
+function readFile(filepath, pass) {
+  textencrypted = fs.readFileSync(filepath, 'utf-8').toString()
+  textdecrypted = CryptoJS.AES.decrypt(textencrypted, pass)
+  textutf8 = textdecrypted.toString(CryptoJS.enc.Utf8)
+  return textutf8
+}
+
+function writeFile(filepath, content, pass) {
+  textencrypted = CryptoJS.AES.encrypt(content, pass).toString()
+  fs.writeFileSync(filepath, textencrypted)
+}
+
+// end general <----
 
 // Make sure JS Journal has access to it's userdata folder ------->
 
@@ -94,11 +112,13 @@ function checkAndRegPass() {
 
 if (hasregistered == false) {
   $('#main').load('html/register.html')
-  $('#passwdv').keypress(function (event) {
-    if (event.which == 13) {
-      checkAndRegPass()
-    }
-  });
+  $(document).ready(function ($) {
+    $('#passwdv').keypress(function (event) {
+      if (event.which == 13) {
+        checkAndRegPass()
+      }
+    });
+  })
 }
 
 // end registered check <--------
@@ -123,9 +143,10 @@ if (hasregistered == true) {
 
 function login() {
   password = $('#passwd').val()
-  if (passwordisset == false && password != undefined && readFile(passcheckPath, password) == passcheck) {
-    passwordisset = true
+  if (unlocked == false && password != undefined && readFile(passcheckPath, password) == passcheck) {
+    unlocked = true
     $('#main').load('html/journal.html')
+    journal()
   } else {
     password = ''
     $('#passwd').val('')
@@ -136,14 +157,53 @@ function login() {
 
 // login end <----
 
-function readFile(filepath, pass) {
-  textencrypted = fs.readFileSync(filepath, 'utf-8').toString()
-  textdecrypted = CryptoJS.AES.decrypt(textencrypted, pass)
-  textutf8 = textdecrypted.toString(CryptoJS.enc.Utf8)
-  return textutf8
+// journal start ---->
+
+function journal() {
+  scanForEntriesDir()
 }
 
-function writeFile(filepath, content, pass) {
-  textencrypted = CryptoJS.AES.encrypt(content, pass).toString()
-  fs.writeFileSync(filepath, textencrypted)
+function scanForEntriesDir() {
+  if (fs.existsSync(entriesfolder)) {
+    scanForEntries()
+  } else {
+    fs.mkdirSync(entriesfolder)
+    scanForEntries()
+  }
 }
+
+function scanForEntries() {
+  var efcontents = fs.readdirSync(entriesfolder, 'utf-8')
+  var eyfolderslist = []
+  for (i = 0; i < efcontents.length; i++) {
+    item = fs.statSync(entriesfolder + '/' + efcontents[i])
+    if (item.isDirectory() && !isNaN(parseInt(efcontents[i]))) {
+      eyfolderslist.push(efcontents[i])
+    }
+  }
+  console.log(eyfolderslist)
+  var eyfolders = []
+  if (eyfolderslist.length > 0) {
+    for (i = 0; i < eyfolderslist.length; i++) {
+      eyfolders.push([])
+      eycontents = fs.readdirSync(entriesfolder + '/' + eyfolderslist[i], 'utf-8')
+      for (u = 0; u < eycontents.length; u++) {
+        item = fs.statSync(entriesfolder + '/' + eyfolderslist[i] + '/' + eycontents[u])
+        if (item.isDirectory() && !isNaN(parseInt(eycontents[u]))) {
+          eyfolders[i].push(eycontents[u])
+        }
+      }
+    }
+  }
+  console.log(eyfolders)
+  var eymfolderslist = []
+  for (i = 0; i < eyfolders.length; i++) {
+    eymfolderslist.push([])
+    if (eyfolders[i].length > 0; i++) {
+      for (l = 0; l < eyfolders[i].length; l++) {
+        // placeholderr
+      }
+    }
+  }
+}
+

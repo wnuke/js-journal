@@ -1,19 +1,28 @@
-<div class="input-group mb-3">
-    <div class="input-group-prepend">
-        <span class="input-group-text" id="passwdr-addon">Password</span>
-    </div>
-    <input id="passwdr" type="password" class="form-control is-invalid" placeholder="Password">
-    <div class="invalid-tooltip" id="passwdr-invalid">
-        Password must be at least 6 characters long.
+<div class="vertical-center">
+    <div class="container jumbotron">
+        <h2>Choose your password:</h2>
+        <br>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="passwdr-addon">Password</span>
+            </div>
+            <input id="passwdr" type="password" class="form-control is-invalid" placeholder="Password">
+            <div class="invalid-tooltip" id="passwdr-invalid">
+                Password must be at least 6 characters long.
+            </div>
+        </div>
+        <br>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="passwdv-addon">Verify Password</span>
+            </div>
+            <input id="passwdv" type="password" class="form-control is-valid" placeholder="Enter password again">
+            <div class="invalid-tooltip" id="passwdv-invalid">
+                Passwords do not match.
+            </div>
+        </div>
+        <br>
+        <p>Make sure it is memorable or write it down somewhere as without it you will not be able to access your journal ever again!</p>
+        <script src="./js/register.js"></script>
     </div>
 </div>
-<div class="input-group mb-3">
-    <div class="input-group-prepend">
-        <span class="input-group-text" id="passwdv-addon">Verify Password</span>
-    </div>
-    <input id="passwdv" type="password" class="form-control is-valid" placeholder="Enter password again">
-    <div class="invalid-tooltip" id="passwdv-invalid">
-        Passwords do not match.
-    </div>
-</div>
-<script src="js/register.js"></script>
