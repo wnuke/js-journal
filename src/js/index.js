@@ -118,11 +118,14 @@ function checkAndRegPass() {
 }
 
 if (hasregistered == false) {
-  $('#main').load('html/register.html')
+  $('#main').load('html/setpassword.html')
   $(document).ready(function ($) {
+    $('#setpasswdbtn').click(function () {
+      checkAndRegPass()
+    })
     $('#passwdv').keypress(function (event) {
       if (event.which == 13) {
-        checkAndRegPass()
+        $('#setpasswdbtn').click()
       }
     });
   })
@@ -133,11 +136,15 @@ if (hasregistered == false) {
 // login ---->
 
 if (hasregistered == true) {
-  $('#main').load('html/login.html')
+  $('#main').load('html/unlock.html')
   $(document).ready(function ($) {
+    $('#passwd').focus()
+    $('#unlockbtn').click(function () {
+      login()
+    })
     $('#passwd').keypress(function (event) {
       if (event.which == 13) {
-        login()
+        $('#unlockbtn').click()
       }
     });
 
@@ -152,7 +159,6 @@ function login() {
   password = $('#passwd').val()
   if (unlocked == false && password != undefined && readFile(passcheckPath, password) == passcheck) {
     unlocked = true
-    $('#main').load('html/journal.html')
     journal()
   } else {
     password = ''
@@ -164,14 +170,15 @@ function login() {
 
 // login end <----
 
-// journal start ---->
-
 var entriesfolder = appDataPath + '/entries'
 var entries = []
 
 function journal() {
   scanForEntries()
+  $('#main').load('html/journal.html')
 }
+
+// scan for entries ---->
 
 function scanForEntries() {
   if (!fs.existsSync(entriesfolder)) {
@@ -185,11 +192,6 @@ function scanForEntries() {
       entries.push(entriesfolder + '/' + possibleentry[1])
     }
   }
-  for (i = 0; i < entries.length; i++) {
-    entrycontent = fs.readFileSync(entries[i], 'utf-8')
-    if (entrycontent.length > 0) {
-      entryjsjversion = entrycontent.split('---')[0].split(': ')[1]
-    }
-  }
 }
 
+// end scan for entries <----
