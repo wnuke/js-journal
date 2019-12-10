@@ -54,7 +54,6 @@ var CryptoJS = require("crypto-js");
 
 var appDataPath = app.getPath('userData') + '/journal'
 var passcheckPath = appDataPath + '/passcheck'
-var entriesfolder = appDataPath + '/entries'
 
 var password
 var unlocked = false
@@ -70,6 +69,14 @@ function readFile(filepath, pass) {
 function writeFile(filepath, content, pass) {
   textencrypted = CryptoJS.AES.encrypt(content, pass).toString()
   fs.writeFileSync(filepath, textencrypted)
+}
+
+function strIsInt(str) {
+  if (!isNaN(parseInt(str))) {
+    return true
+  } else {
+    return false
+  }
 }
 
 // end general <----
@@ -159,6 +166,12 @@ function login() {
 
 // journal start ---->
 
+var entriesfolder = appDataPath + '/entries'
+var yearfolderlist = []
+var monthfolderlist = []
+var dayfolderlist = []
+var entrieslist = []
+
 function journal() {
   scanForEntriesDir()
 }
@@ -173,35 +186,55 @@ function scanForEntriesDir() {
 }
 
 function scanForEntries() {
-  var efcontents = fs.readdirSync(entriesfolder, 'utf-8')
-  var eyfolderslist = []
-  for (i = 0; i < efcontents.length; i++) {
-    item = fs.statSync(entriesfolder + '/' + efcontents[i])
-    if (item.isDirectory() && !isNaN(parseInt(efcontents[i]))) {
-      eyfolderslist.push(efcontents[i])
+  entriesfoldercontents = fs.readdirSync(entriesfolder, 'utf-8')
+  for (i = 0; i < entriesfoldercontents.length; i++) {
+    item = fs.statSync(entriesfolder + '/' + entriesfoldercontents[i])
+    if (strIsInt(entriesfoldercontents[i]) == true && item.isDirectory()) {
+      yearfolderlist.push(entriesfoldercontents[i])
+      monthfolderlist.push([])
+      dayfolderlist.push([])
+      entrieslist.push([])
     }
   }
-  console.log(eyfolderslist)
-  var eyfolders = []
-  if (eyfolderslist.length > 0) {
-    for (i = 0; i < eyfolderslist.length; i++) {
-      eyfolders.push([])
-      eycontents = fs.readdirSync(entriesfolder + '/' + eyfolderslist[i], 'utf-8')
-      for (u = 0; u < eycontents.length; u++) {
-        item = fs.statSync(entriesfolder + '/' + eyfolderslist[i] + '/' + eycontents[u])
-        if (item.isDirectory() && !isNaN(parseInt(eycontents[u]))) {
-          eyfolders[i].push(eycontents[u])
-        }
+  for (i = 0; i < yearfolderlist.length; i++) {
+    yearfoldercontents = fs.readdirSync(entriesfolder + '/' + yearfolderlist[i])
+    for (j = 0; j < yearfoldercontents.length; j++) {
+      item = fs.statSync(entriesfolder + '/' + yearfolderlist[i] + '/' + yearfoldercontents[j])
+      if (strIsInt(yearfoldercontents[j]) == true && item.isDirectory()) {
+        monthfolderlist[i].push(yearfoldercontents[j])
+        dayfolderlist[i].push([])
+        entrieslist[i].push([])
       }
     }
   }
-  console.log(eyfolders)
-  var eymfolderslist = []
-  for (i = 0; i < eyfolders.length; i++) {
-    eymfolderslist.push([])
-    if (eyfolders[i].length > 0; i++) {
-      for (l = 0; l < eyfolders[i].length; l++) {
-        // placeholderr
+
+  if (monthfolderlist.length > 0) {
+    for (i = 0; i < yearfolderlist.length; i++) {
+      for (j = 0; j < monthfolderlist[i].length; j++) {
+        monthfoldercontents = fs.readdirSync(entriesfolder + '/' + yearfolderlist[i] + '/' + monthfolderlist[i][j])
+        for (k = 0; k < monthfoldercontents.length; k++) {
+          item = fs.statSync(entriesfolder + '/' + yearfolderlist[i] + '/' + monthfolderlist[i][j] + '/' + monthfoldercontents[k])
+          if (strIsInt(monthfoldercontents[k]) == true && item.isDirectory()) {
+            dayfolderlist[i][j].push(monthfoldercontents[k])
+            entrieslist[i][j].push([])
+          }
+        }
+      }
+    }
+
+    for (i = 0; i < yearfolderlist.length; i++) {
+      for (j = 0; j < monthfolderlist[i].length; j++) {
+        if (dayfolderlist[i].length > 0) {
+          for (k = 0; k < dayfolderlist[i][j].length; k++) {
+            dayfoldercontents = fs.readdirSync(entriesfolder + '/' + yearfolderlist[i] + '/' + monthfolderlist[i][j] + '/' + dayfolderlist[i][j][k])
+            for (l = 0; l < dayfoldercontents.length; l++) {
+              item = fs.statSync(entriesfolder + '/' + yearfolderlist[i] + '/' + monthfolderlist[i][j] + '/' + dayfolderlist[i][j][k] + '/' + dayfoldercontents[l])
+              if (item.isFile()) {
+                entrieslist[i][j][k].push(dayfoldercontents[l])
+              }
+            }
+          }
+        }
       }
     }
   }
