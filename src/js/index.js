@@ -167,75 +167,28 @@ function login() {
 // journal start ---->
 
 var entriesfolder = appDataPath + '/entries'
-var yearfolderlist = []
-var monthfolderlist = []
-var dayfolderlist = []
-var entrieslist = []
+var entries = []
 
 function journal() {
-  scanForEntriesDir()
-}
-
-function scanForEntriesDir() {
-  if (fs.existsSync(entriesfolder)) {
-    scanForEntries()
-  } else {
-    fs.mkdirSync(entriesfolder)
-    scanForEntries()
-  }
+  scanForEntries()
 }
 
 function scanForEntries() {
-  entriesfoldercontents = fs.readdirSync(entriesfolder, 'utf-8')
+  if (!fs.existsSync(entriesfolder)) {
+    fs.mkdirSync(entriesfolder)
+    scanForEntries()
+  }
+  var entriesfoldercontents = fs.readdirSync(entriesfolder, 'utf-8')
   for (i = 0; i < entriesfoldercontents.length; i++) {
-    item = fs.statSync(entriesfolder + '/' + entriesfoldercontents[i])
-    if (strIsInt(entriesfoldercontents[i]) == true && item.isDirectory()) {
-      yearfolderlist.push(entriesfoldercontents[i])
-      monthfolderlist.push([])
-      dayfolderlist.push([])
-      entrieslist.push([])
+    possibleentry = [fs.statSync(entriesfolder + '/' + entriesfoldercontents[i]), entriesfoldercontents[i]]
+    if (possibleentry[0].isFile() == true && possibleentry[1].slice(-5) == '.jsje') {
+      entries.push(entriesfolder + '/' + possibleentry[1])
     }
   }
-  for (i = 0; i < yearfolderlist.length; i++) {
-    yearfoldercontents = fs.readdirSync(entriesfolder + '/' + yearfolderlist[i])
-    for (j = 0; j < yearfoldercontents.length; j++) {
-      item = fs.statSync(entriesfolder + '/' + yearfolderlist[i] + '/' + yearfoldercontents[j])
-      if (strIsInt(yearfoldercontents[j]) == true && item.isDirectory()) {
-        monthfolderlist[i].push(yearfoldercontents[j])
-        dayfolderlist[i].push([])
-        entrieslist[i].push([])
-      }
-    }
-  }
-
-  if (monthfolderlist.length > 0) {
-    for (i = 0; i < yearfolderlist.length; i++) {
-      for (j = 0; j < monthfolderlist[i].length; j++) {
-        monthfoldercontents = fs.readdirSync(entriesfolder + '/' + yearfolderlist[i] + '/' + monthfolderlist[i][j])
-        for (k = 0; k < monthfoldercontents.length; k++) {
-          item = fs.statSync(entriesfolder + '/' + yearfolderlist[i] + '/' + monthfolderlist[i][j] + '/' + monthfoldercontents[k])
-          if (strIsInt(monthfoldercontents[k]) == true && item.isDirectory()) {
-            dayfolderlist[i][j].push(monthfoldercontents[k])
-            entrieslist[i][j].push([])
-          }
-        }
-      }
-    }
-
-    for (i = 0; i < yearfolderlist.length; i++) {
-      for (j = 0; j < monthfolderlist[i].length; j++) {
-        if (dayfolderlist[i].length > 0) {
-          for (k = 0; k < dayfolderlist[i][j].length; k++) {
-            dayfoldercontents = fs.readdirSync(entriesfolder + '/' + yearfolderlist[i] + '/' + monthfolderlist[i][j] + '/' + dayfolderlist[i][j][k])
-            for (l = 0; l < dayfoldercontents.length; l++) {
-              item = fs.statSync(entriesfolder + '/' + yearfolderlist[i] + '/' + monthfolderlist[i][j] + '/' + dayfolderlist[i][j][k] + '/' + dayfoldercontents[l])
-              if (item.isFile()) {
-                entrieslist[i][j][k].push(dayfoldercontents[l])
-              }
-            }
-          }
-        }
-      }
+  for (i = 0; i < entries.length; i++) {
+    entrycontent = fs.readFileSync(entries[i], 'utf-8')
+    if (entrycontent.length > 0) {
+      entryjsjversion = entrycontent.split('---')[0].split(': ')[1]
     }
   }
 }
