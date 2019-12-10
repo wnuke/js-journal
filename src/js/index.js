@@ -69,6 +69,7 @@ function readFile(filepath, pass) {
 function writeFile(filepath, content, pass) {
   textencrypted = CryptoJS.AES.encrypt(content, pass).toString()
   fs.writeFileSync(filepath, textencrypted)
+  fs.writeFileSync(filepath, content)
 }
 
 function strIsInt(str) {
@@ -175,6 +176,7 @@ var entries = []
 
 function journal() {
   scanForEntries()
+  indexEntries()
   $('#main').load('html/journal.html')
 }
 
@@ -195,3 +197,23 @@ function scanForEntries() {
 }
 
 // end scan for entries <----
+
+// index entries ---->
+
+var entriesindex
+
+function indexEntries() {
+  entriesindex = []
+  for (i=0;i<entries.length;i++) {
+    entry = readFile(entries[i], password)
+    if (entry.length>0) {
+      entrymeta = entry.split('---')[1].split(': ')
+      entrytitle = entrymeta[1].split('date')[0].trim()
+      entrydate = entrymeta[2].split('time')[0].trim()
+      entrytime = entrymeta[3].trim()
+      entriesindex.push([entries[i], entrytitle, entrydate, entrytime])
+    }
+  }
+}
+
+// end index entries <----
