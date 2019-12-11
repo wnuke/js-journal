@@ -179,6 +179,7 @@ var entriesfolder = appDataPath + '/entries'
 var entries = []
 
 function journal() {
+  $('#main').load('html/indexing.html')
   scanForEntries()
   indexEntries()
   $('#main').load('html/journal.html')
