@@ -6,9 +6,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "lint": "eslint src --color",
-    "build": "electron-builder build -p never",
-    "test": "mocha"
+    "build": "electron-builder build -p never"
   },
   "build": {
     "appId": "com.willem.js-journal",
