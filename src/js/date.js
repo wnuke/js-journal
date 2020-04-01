@@ -23,19 +23,22 @@ function markdownDate(date) {
 	return mddatestr + mdyear + mddate + mdtime;
 }
 
-function getTodayDateTime() {
+async function getTodayDateTime() {
 	Intl.DateTimeFormat().resolvedOptions().timeZone;
-	var d = new Date();
-	var nowday = JSON.stringify(makeTwoDig(d.getDate()));
+	let d = await new Date();
+	var nowday = makeTwoDig(d.getDate());
 	var nowmonth = makeTwoDig(d.getMonth() + 1);
 	var nowyear = JSON.stringify(d.getFullYear());
 	var nowhours = d.getHours();
 	var nowminutes = d.getMinutes();
 	var nowseconds = d.getSeconds();
-	var nowtime = [nowhours, nowminutes, nowseconds];
-	var nowdate = [nowyear, nowmonth, nowday];
-	var nowdatetime = [nowdate, nowtime];
-	return nowdatetime;
+	let nowdatetime = await Promise.all([nowday, nowmonth, nowyear, nowhours, nowminutes, nowseconds]).then(function(dt) {
+		var nowtime = [makeTwoDig(dt[3]), makeTwoDig(dt[4]), makeTwoDig(dt[5])];
+		var nowdate = [dt[2], dt[1], dt[0]];
+		var nowdatetime = [nowdate, nowtime];
+		return nowdatetime;
+	})
+	return nowdatetime
 }
 
 function getFullDate(year, month, day) {

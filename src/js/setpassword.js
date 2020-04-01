@@ -1,8 +1,6 @@
 var passwdrval;
 var passwdvval;
 
-let $ = require('jquery');
-
 function checkPassValid() {
 	if (passwdrval.length < 6) {
 		$('#passwdr').removeClass('is-valid');
