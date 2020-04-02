@@ -37,8 +37,8 @@ async function getTodayDateTime() {
 		var nowdate = [dt[2], dt[1], dt[0]];
 		var nowdatetime = [nowdate, nowtime];
 		return nowdatetime;
-	})
-	return nowdatetime
+	});
+	return nowdatetime;
 }
 
 function getFullDate(year, month, day) {

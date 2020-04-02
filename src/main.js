@@ -17,7 +17,8 @@ function createWindow() {
 		'webPreferences': {
 			'nodeIntegration': true
 		},
-		'width': 840
+		'width': 840,
+		backgroundColor: '#222222'
 	});
 	/*eslint-disable */
   mainWindow.webContents.on('new-window', function(e, url) {

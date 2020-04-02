@@ -28,12 +28,14 @@
   "author": "willem",
   "license": "MIT",
   "dependencies": {
+    "babel-preset-react": "^6.24.1",
+    "babel-register": "^6.26.0",
     "bootstrap": "^4.4.1",
     "crypto-js": "^3.1.9-1",
     "eslint-plugin-react": "^7.19.0",
-    "jquery": "^3.4.1",
-    "popper.js": "^1.16.0",
-    "showdown": "^1.9.1"
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "^3.4.1"
   },
   "devDependencies": {
     "electron": "^7.1.3",

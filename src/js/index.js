@@ -1,5 +1,9 @@
 // general variables and functions ---->
 
+require('babel-register')({
+	presets: ['react']
+});
+
 var dt = require('./js/date.js');
 
 const remote = require('electron').remote;
@@ -8,22 +12,22 @@ const app = remote.app;
 const fs = require('fs');
 var CryptoJS = require('crypto-js');
 
-let $ = require('jquery');
-
 var appDataPath = app.getPath('userData') + '/journal';
 var passcheckPath = appDataPath + '/passcheck';
 
 var password;
 var unlocked = false;
 
+var entriesfolder = appDataPath + '/entries';
+var entriesindex;
+
 async function readFile(filepath, pass) {
 	let promise = new Promise((resolve) => {
 		fs.promises.readFile(filepath, 'utf-8')
 			.then((data) => {
-				resolve(data)
-			})
-			.catch((err) => reject(err))
-	})
+				resolve(data);
+			});
+	});
 	let textencrypted = await promise;
 	let textdecrypted = await CryptoJS.AES.decrypt(textencrypted, pass);
 	let textutf8 = await textdecrypted.toString(CryptoJS.enc.Utf8);
@@ -31,12 +35,12 @@ async function readFile(filepath, pass) {
 }
 
 async function writeFile(filepath, content, pass) {
-	var encrypteddata = CryptoJS.AES.encrypt(content, pass).toString();
+	var encrypteddata = await CryptoJS.AES.encrypt(content, pass).toString();
 	let promise = new Promise((resolve, reject) => {
 		fs.promises.writeFile(filepath, encrypteddata)
 			.then(() => resolve('Wrote file "' + filepath + '".'))
 			.catch(() => reject('Error: could not write file "' + filepath + '".'));
-	})
+	});
 	let result = await promise;
 	return result;
 }
@@ -51,6 +55,12 @@ async function writeFile(filepath, content, pass) {
 
 // end general <----
 
+// load all jsx files --->
+
+var ui = require('./jsx/ui.jsx');
+
+// end jsx load <------
+
 // Make sure JS Journal has access to it's userdata folder ------->
 
 async function quitNoAccess(folder) {
@@ -60,31 +70,50 @@ async function quitNoAccess(folder) {
 
 async function createUserDataFolder() {
 	fs.promises.mkdir(app.getPath('userData'))
+		.then(() => checkJournalDir())
 		.catch(() => quitNoAccess(app.getPath('userData')));
 }
 
 fs.promises.access(app.getPath('userData'), fs.constants.R_OK | fs.constants.W_OK)
-	.then(() => checkFiles())
+	.then(() => checkJournalDir())
 	.catch(() => createUserDataFolder());
 
 // end permissions check <----------
 
 // Check if user has already registered / created a journal and if not create basic dir tree and make user set password ----->
 
-async function checkFiles() {
+async function checkPassCheckFile() {
 	fs.promises.readFile(passcheckPath)
-		.then(() => unlock())
-		.catch(() => setpassword());
+		.then(() => showUnlock())
+		.catch(() => showSetPassword());
+
 }
 
-fs.promises.access(appDataPath)
-	.then(() => checkFiles())
-	.catch(() =>
-		fs.promises.mkdir(appDataPath)
-			.then(() => checkFiles())
-			.catch(() => createUserDataFolder())
-	);
+async function checkEntriesDir() {
+	let promise = new Promise(() => {
+		fs.access(entriesfolder, fs.constants.F_OK, (error) => {
+			if (error) {
+				fs.promises.mkdir(entriesfolder)
+					.then(() => checkPassCheckFile())
+					.catch(() => quitNoAccess(entriesfolder));
+			} else {
+				checkPassCheckFile();
+			}
+		});
+	});
+	let result = await promise();
+	return result;
+}
 
+async function checkJournalDir() {
+	fs.promises.access(appDataPath)
+		.then(() => checkEntriesDir())
+		.catch(() =>
+			fs.promises.mkdir(appDataPath)
+				.then(() => checkEntriesDir())
+				.catch(() => createUserDataFolder())
+		);
+}
 
 async function sha1Base64(text) {
 	let bytes = await CryptoJS.enc.Utf16LE.parse(text);
@@ -93,76 +122,65 @@ async function sha1Base64(text) {
 	return hashBase64;
 }
 
+async function checkNewPass() {
+	var newpass = await document.getElementById('registerpass').value;
+	var vernewpass = await document.getElementById('verifypass').value;
+	if (newpass.length >= 6 && vernewpass == newpass) {
+		ui.setpassword(true, true);
+		return [true, newpass];
+	} else if (newpass.length <= 6 && vernewpass == newpass) {
+		ui.setpassword(false, true);
+	} else if (newpass != vernewpass && newpass.length >= 6) {
+		ui.setpassword(true, false);
+	} else {
+		ui.setpassword(false, false);
+	}
+}
+
 async function checkAndRegPass() {
-	if ($('#passwdr').val() == $('#passwdv').val() && $('#passwdr').hasClass('is-invalid') == false && $('#passwdv').hasClass('is-invalid') == false) {
-		password = $('#passwdr').val();
-		await writeFile(passcheckPath, sha1Base64(password), password);
+	var newpassval = await checkNewPass();
+	if (newpassval[0] == true) {
+		password = newpassval[1];
+		var passHash = await sha1Base64(password);
+		console.log(passHash, ' ', passcheckPath, ' ', password, ' ', newpassval);
+		await writeFile(passcheckPath, passHash, password);
 		location.reload();
 	}
 }
 
-async function setpassword() {
-	$('#main').load('html/setpassword.html');
-	$(document).ready(function ($) {
-		$('#setpasswdbtn').click(function () {
-			checkAndRegPass();
-		});
-		$('#passwdv').keypress(function (event) {
-			if (event.which == 13) {
-				$('#setpasswdbtn').click();
-			}
-		});
-	});
+async function showSetPassword() {
+	ui.setpassword();
 }
 
 // end registered check <--------
 
 // login ---->
 
-async function unlock() {
-	$('#main').load('html/unlock.html');
-	$(document).ready(function ($) {
-		$('#passwd').focus();
-		$('#unlockbtn').click(function () {
-			login();
-		});
-		$('#passwd').keypress(function (event) {
-			if (event.which == 13) {
-				$('#unlockbtn').click();
-			}
-		});
-
-		$('#passwd').on('input', function () {
-			$('#passwd-invalid').hide();
-			$('#passwd').removeClass('is-invalid');
-		});
-	});
+function showUnlock() {
+	ui.unlock(true);
 }
 
 async function login() {
-	password = $('#passwd').val();
-	let passcheckResult = await readFile(passcheckPath, password)
-	if (unlocked == false && password != undefined && passcheckResult == await sha1Base64(password)) {
+	password = document.getElementById('loginPass').value;
+	var passcheckResult = await readFile(passcheckPath, password);
+	var passHash = await sha1Base64(password);
+	if (unlocked == false && password != undefined && passcheckResult == passHash) {
 		unlocked = true;
 		journal();
 	} else {
 		password = '';
-		$('#passwd').val('');
-		$('#passwd-invalid').show();
-		$('#passwd').addClass('is-invalid');
+		ui.unlock(false);
+		document.getElementById('loginPass').value = '';
 	}
 }
 
 // login end <----
 
-var entriesfolder = appDataPath + '/entries';
-var entriesindex;
-
 async function journal() {
-	$('#main').load('html/indexing.html');
+	ui.indexing();
 	let entries = await scanForEntries();
-	indexEntries(entries)
-	$('#main').load('html/journal.html');
+	indexEntries(entries);
+	// load main journal ui here
 }
 
 // scan for entries ---->
@@ -174,11 +192,9 @@ async function scanForEntries() {
 				console.error(
 					`"${entriesfolder}" ${err.code === 'ENOENT' ? 'does not exist' : 'is read-only'}`);
 			} else {
-				console.log(`"${entriesfolder}" exists, and it is writable`);
-				entries = [];
 				fs.readdir(entriesfolder, 'utf-8', async (err, files) => {
 					if (err) {
-						console.error(err)
+						console.error(err);
 					} if (files) {
 						let entriespromise = await new Promise(async (resolve) => {
 							var entries = [];
@@ -192,15 +208,15 @@ async function scanForEntries() {
 									})
 									.catch(() => quitNoAccess(entriesfolder + '/' + files[i]));
 							}
-							resolve(entries)
-						})
-						let entries = await entriespromise
-						resolve(entries)
+							resolve(entries);
+						});
+						let entries = await entriespromise;
+						resolve(entries);
 					}
-				})
+				});
 			}
-		})
-	})
+		});
+	});
 	let result = await promise;
 	return result;
 }
@@ -219,12 +235,11 @@ async function indexEntries(entries) {
 			var entrydate = entrymeta[2].split('time')[0].trim();
 			var entrytime = entrymeta[3].trim();
 			let meta = await Promise.all([entrytitle, entrydate, entrytime]).then(function (em) {
-				return [entries[i], em[0], em[1], em[2]]
-			})
+				return [entries[i], em[0], em[1], em[2]];
+			});
 			entriesindex.push(meta);
 		}
 	}
-	console.log(entriesindex);
 }
 
 
@@ -241,5 +256,5 @@ time: ${time}
 ---`;
 	await writeFile(entriesfolder + '/' + entrynumber + '.jsje', entryfilecontent, password);
 	let entries = await scanForEntries();
-	indexEntries(entries)
+	indexEntries(entries);
 }

@@ -28,7 +28,7 @@ function checkPassEqual() {
 $(document).ready(function ($) {
 	$('#passwdr').focus();
 	$('#passwdr').keypress(function (event) {
-		if (event.which == 13) {
+		if (event.which === 13) {
 			$('#passwdv').focus();
 		}
 	});
